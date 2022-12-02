@@ -2,6 +2,7 @@ mod days;
 mod soultions;
 
 use std::env;
+use std::time::Instant;
 use days::{day01, day02, day03, day04, day05,
     day06, day07, day08, day09, day10,
     day11, day12, day13, day14, day15,
@@ -20,14 +21,24 @@ fn main() {
         .map(|x| x.parse().unwrap_or_else(|v| panic!("Not a valid day: {}", v)))
         .collect();
 
+    let mut runtime = 0.0;
+
     for day in days {
         let func = get_day_solver(day);
-        // add timing functions here if u care about that maybe later
+
+        let time = Instant::now();
         let (p1, p2) = func();
+        let elapsed_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
+
         println!("\n=== Day {:02} ===", day);
         println!("  · Part 1: {}", p1);
         println!("  · Part 2: {}", p2);
+        println!("  · Elapsed: {:.4} ms", elapsed_ms);
+
+        runtime += elapsed_ms;
     }
+
+    println!("Total runtime: {:.4} ms", runtime);
 }
 
 fn get_day_solver(day: u8) -> fn() -> SolutionPair {

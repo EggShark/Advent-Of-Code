@@ -10,8 +10,6 @@ pub fn solve() -> SolutionPair {
     let input = read_to_string("./texts/day01.txt").unwrap();
     let tool: Vec<&str> = input.split("\n").collect();
 
-    println!("{:?}", tool);
-
     let mut largest_sum = 0;
     let mut current_sum = 0;
 
