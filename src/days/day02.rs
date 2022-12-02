@@ -1,8 +1,6 @@
 use crate::{Solution, SolutionPair};
 use std::fs::read_to_string;
 
-///////////////////////////////////////////////////////////////////////////////
-
 pub fn solve() -> SolutionPair {
     // Your solution here...
     let text = read_to_string("./texts/day02.txt").unwrap();
