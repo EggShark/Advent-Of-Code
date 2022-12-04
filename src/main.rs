@@ -2,13 +2,12 @@ mod days;
 mod soultions;
 
 use std::env;
-use std::time::Instant;
 use days::{day01, day02, day03, day04, day05,
     day06, day07, day08, day09, day10,
     day11, day12, day13, day14, day15,
     day16, day17, day18, day19, day20,
     day21, day22, day23, day24, day25};
-use soultions::{Solution, SolutionPair};
+use soultions::{Solution, SolutionType};
 
 
 fn main() {
@@ -25,23 +24,21 @@ fn main() {
 
     for day in days {
         let func = get_day_solver(day);
-
-        let time = Instant::now();
-        let (p1, p2) = func();
-        let elapsed_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
+        let sol = func();
+        let (p1, p2) = sol.solution;
 
         println!("\n=== Day {:02} ===", day);
         println!("  · Part 1: {}", p1);
         println!("  · Part 2: {}", p2);
-        println!("  · Elapsed: {:.4} ms", elapsed_ms);
+        println!("  · Elapsed: {:.4} ms", sol.time_ms);
 
-        runtime += elapsed_ms;
+        runtime += sol.time_ms;
     }
 
     println!("Total runtime: {:.4} ms", runtime);
 }
 
-fn get_day_solver(day: u8) -> fn() -> SolutionPair {
+fn get_day_solver(day: u8) -> fn() -> Solution {
     match day {
          1 => day01::solve,
          2 => day02::solve,

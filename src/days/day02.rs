@@ -1,9 +1,12 @@
-use crate::{Solution, SolutionPair};
+use crate::{Solution, SolutionType};
 use std::fs::read_to_string;
+use std::time::Instant;
 
-pub fn solve() -> SolutionPair {
+pub fn solve() -> Solution {
     // Your solution here...
     let text = read_to_string("./texts/day02.txt").unwrap();
+    let time = Instant::now();
+
     let moves: Vec<String> = text.lines().map(|l| l.to_string()).collect();
 
     let mut score = 0;
@@ -11,27 +14,21 @@ pub fn solve() -> SolutionPair {
     for line in &moves {
         let my_move = &line[2..3];
         let opponent_move = &line[0..1];
-        println!("{}, {}", my_move, opponent_move);
         if my_move == "Y" {
             score += 2; // paper
-            println!("paper")
         } 
         if my_move == "X" {
             score += 1; // rock
-            println!("rock")
         }
         if my_move == "Z" {
             score += 3; // siccors
-            println!("siccors")
         }
     
         if is_win(my_move, opponent_move) {
             score += 6;
-            println!("win")
         } else if is_draw(my_move, opponent_move) {
             //draw
             score += 3;
-            println!("draw")
         }
     }
 
@@ -62,7 +59,13 @@ pub fn solve() -> SolutionPair {
     let sol1: u64 = score;
     let sol2: u64 = score2;
 
-    (Solution::U64(sol1), Solution::U64(sol2))
+    let solution = (SolutionType::U64(sol1), SolutionType::U64(sol2));
+    let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
+
+    Solution {
+        solution,
+        time_ms,
+    }
 }
 
 fn is_win(my_move: &str, opponent_move: &str) -> bool {

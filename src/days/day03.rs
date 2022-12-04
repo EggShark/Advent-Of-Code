@@ -1,11 +1,13 @@
-use crate::{Solution, SolutionPair};
+use crate::{Solution, SolutionType};
 use std::fs::read_to_string;
+use std::time::Instant;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-pub fn solve() -> SolutionPair {
+pub fn solve() -> Solution {
     // Your solution here...
     let input = read_to_string("./texts/day03.txt").unwrap();
+    let time = Instant::now();
 
     let x: u32 = input.split("\n").collect::<Vec<&str>>()
         .iter()
@@ -49,7 +51,12 @@ pub fn solve() -> SolutionPair {
     let sol1: u32 = x;
     let sol2: u32 = counter;
 
-    (Solution::U32(sol1), Solution::U32(sol2))
+    let solution = (SolutionType::U32(sol1), SolutionType::U32(sol2));
+    let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
+    Solution {
+        solution,
+        time_ms,
+    }
 }
 
 const ALPHABET: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

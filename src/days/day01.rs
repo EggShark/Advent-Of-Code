@@ -1,13 +1,14 @@
 
-use crate::{Solution, SolutionPair};
+use crate::{Solution, SolutionType};
 use std::fs::read_to_string;
-
+use std::time::Instant;
 ///////////////////////////////////////////////////////////////////////////////
 
-pub fn solve() -> SolutionPair {
+pub fn solve() -> Solution {
     // Your solution here...
 
     let input = read_to_string("./texts/day01.txt").unwrap();
+    let time = Instant::now();
     let tool: Vec<&str> = input.split("\n").collect();
 
     let mut largest_sum = 0;
@@ -35,6 +36,10 @@ pub fn solve() -> SolutionPair {
 
     let sol1: u64 = largest_sum;
     let sol2: u64 = largest_sum + sum2 + sum3;
-
-    (Solution::U64(sol1), Solution::U64(sol2))
+    let elapsed_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
+    
+    Solution {
+        solution: (SolutionType::U64(sol1), SolutionType::U64(sol2)),
+        time_ms: elapsed_ms,
+    }
 }

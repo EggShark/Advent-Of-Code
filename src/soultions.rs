@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter, Result};
 
-pub enum Solution {
+pub enum SolutionType {
     I32(i32),
     I64(i64),
     I128(i128),
@@ -10,9 +10,14 @@ pub enum Solution {
     Str(String),
 }
 
-pub type SolutionPair = (Solution, Solution);
+pub type SolutionPair = (SolutionType, SolutionType);
 
-impl Display for Solution {
+pub struct Solution {
+    pub solution: SolutionPair,
+    pub time_ms: f64,
+}
+
+impl Display for SolutionType {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
             Self::I32(x) => x.fmt(f),
