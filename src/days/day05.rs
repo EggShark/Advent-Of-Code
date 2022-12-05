@@ -17,7 +17,7 @@ pub fn solve() -> Solution {
         let mut counter = 0;
         let mut pos = 0;
         let mut iter = line.chars();
-        let skip = iter.next().unwrap(); // used to skip first bracket
+        let _skip = iter.next().unwrap(); // used to skip first bracket
         for char in iter {
             if char.is_alphabetic() {
                 pain[pos].push(char.to_string());
@@ -29,11 +29,17 @@ pub fn solve() -> Solution {
 
         }
     }
-    let mut stacks: Vec<Stack> = Vec::new();
+    let mut stacks1: Vec<Stack> = Vec::new();
+    let mut stacks2: Vec<Stack> = Vec::new();
+
+        
+    for stack in pain.iter_mut() {
+        stacks1.push(Stack{stack: stack.to_vec()});
+    }
 
     for mut stack in pain {
         stack.reverse();
-        stacks.push(Stack{stack});
+        stacks2.push(Stack{stack});
     }
 
     let instructions = instructions[1];
@@ -46,26 +52,39 @@ pub fn solve() -> Solution {
         [a, b, c]
     }).collect(); 
 
+    // part 1 solve
+    for instruction in instructions.iter() {
+        let amount = instruction[0];
+        for _ in 0..amount {
+            let x = stacks1[instruction[1] - 1].stack.pop().unwrap();
+            stacks1[instruction[2] - 1].stack.push(x);
+        }
+    }
+
+    // part 2
     for instruction in instructions {
         let amount = instruction[0];
         let from = instruction[1] - 1;
         let to = instruction[2] - 1;
         let mut a = Vec::new();
-        for i in stacks[from].stack.len() - amount..stacks[from].stack.len() {
-            a.push(stacks[from].stack[i].to_owned());
+        for i in stacks2[from].stack.len() - amount..stacks2[from].stack.len() {
+            a.push(stacks2[from].stack[i].to_owned());
         }
         for _ in 0..amount {
-            stacks[from].stack.pop();
+            stacks2[from].stack.pop();
         }
         for thing in a {
-            stacks[to].stack.push(thing);
+            stacks2[to].stack.push(thing);
         }
     }
 
-    let sol1 = String::from("FCVRLMVQP");
+    let mut sol1 = String::new();
     let mut sol2 = String::new();
 
-    for stack in stacks {
+    for stack in stacks1 {
+        sol1 += &stack.stack[stack.stack.len() - 1];
+    }
+    for stack in stacks2 {
         sol2 += &stack.stack[stack.stack.len() - 1];
     }
 
@@ -80,12 +99,6 @@ pub fn solve() -> Solution {
 #[derive(Debug)]
 struct Stack {
     stack: Vec<String>,
-}
-
-impl Stack {
-    fn get_slice(&self, start: usize) -> &[String] {
-        &self.stack[self.stack.len() - start..self.stack.len()]
-    }
 }
 
 // part 1 solve
