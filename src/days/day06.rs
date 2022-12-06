@@ -1,7 +1,6 @@
 use crate::{Solution, SolutionType};
 use std::fs::read_to_string;
 use std::time::Instant;
-use itertools::{Itertools, Unique};
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn solve() -> Solution {
