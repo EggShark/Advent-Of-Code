@@ -10,7 +10,6 @@ pub fn solve() -> Solution {
 
 
     let mut vec1 = Vec::new();
-
     for line in text.lines() {
         let z = line.split(",");
         for s in z {

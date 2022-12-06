@@ -45,7 +45,6 @@ pub fn solve() -> Solution {
     let instructions = instructions[1];
     let instructions: Vec<[usize; 3]> = instructions.lines().map(|line| {
         let x: Vec<&str> = line.split_whitespace().collect();
-        println!("{:?}", x);
         let a = x[1].parse::<usize>().unwrap();
         let b = x[3].parse::<usize>().unwrap();
         let c = x[5].parse::<usize>().unwrap();
