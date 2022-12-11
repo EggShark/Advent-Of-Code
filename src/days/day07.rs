@@ -20,7 +20,6 @@ pub fn solve() -> Solution {
         if line.starts_with('$') {
             current_node = parse_command(&x, &current_node, &root)
         } else if let [dir_size, name] = &x[..] {
-            println!("{line}");
             parse_ls(dir_size, &current_node, name);
         }
     }
@@ -77,7 +76,6 @@ fn instert_child(dir_size: &str, cur_node: &Rc<RefCell<Node>>, name: &str) {
     let mut m_child = child.borrow_mut();
     if dir_size != "dir" {
         m_child.is_file = true;
-        println!("{dir_size}");
         m_child.size = Some(dir_size.parse().unwrap());
     }
     m_child.parent = Some(Rc::clone(cur_node));
