@@ -9,7 +9,7 @@ pub fn solve() -> Solution {
     let input = read_to_string("./texts/day03.txt").unwrap();
     let time = Instant::now();
 
-    let x: u32 = input.split("\n").collect::<Vec<&str>>()
+    let x: u32 = input.lines().collect::<Vec<&str>>()
         .iter()
         .map(|g| {
             let g = g.to_string();

@@ -9,7 +9,7 @@ pub fn solve() -> Solution {
 
     let input = read_to_string("./texts/day01.txt").unwrap();
     let time = Instant::now();
-    let tool: Vec<&str> = input.split("\n").collect();
+    let tool: Vec<&str> = input.lines().collect();
 
     let mut largest_sum = 0;
     let mut current_sum = 0;
