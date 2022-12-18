@@ -5,7 +5,7 @@ use std::time::Instant;
 
 pub fn solve() -> Solution {
     // Your solution here...
-    let text = read_to_string("").unwrap();
+    let text = read_to_string("./texts/day16.txt").unwrap();
     let time = Instant::now();
 
     let sol1: u64 = 0;
