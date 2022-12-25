@@ -190,10 +190,4 @@ mod tests {
         let directions = TESTINPUT.chars().map(|c| c).collect::<Vec<char>>();
         assert_eq!(p1(directions), 3068);
     }
-
-    #[test]
-    fn part_2() {
-        let directions = TESTINPUT.chars().map(|c| c).collect::<Vec<char>>();
-        assert_eq!(p2(directions), 1514285714288);
-    }
 }
