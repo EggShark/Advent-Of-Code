@@ -21,7 +21,7 @@ fn main() {
 
     match year {
         2022 => aoc2022::run(&days),
-        2023 => todo!(),
+        2023 => aoc2023::run(&days),
         _ => unimplemented!(),
     }
 }
