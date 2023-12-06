@@ -76,24 +76,14 @@ pub fn solve() -> Solution {
         .parse::<u64>()
         .unwrap();
 
-    let req_speed= race_time/distance;
+    let req_speed = race_time/distance;
 
-    let mut p2 = 0;
-
-    for speed in req_speed..race_time {
-        let distance_travled = (race_time-speed) * speed;
-        if distance_travled > distance {
-            p2 += 1;
-        }
-    }
-
-    // leaving this here bc its so much slower but looks better imo
-    // let p2 = (req_speed..race_time)
-    //     .filter(|speed| (race_time-speed) * speed > distance)
-    //     .count();
+    let p2 = (req_speed..race_time)
+        .filter(|speed| (race_time-speed) * speed > distance)
+        .count();
 
     let sol1: u64 = p1;
-    let sol2: u64 = p2;
+    let sol2: u64 = p2 as u64;
 
     let solution = (SolutionType::U64(sol1), SolutionType::U64(sol2));
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;

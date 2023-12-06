@@ -6,7 +6,7 @@ use std::time::Instant;
 
 pub fn solve() -> Solution {
     // Your solution here...
-    let text = read_to_string("src/aoc2023/texts/day6").unwrap();
+    let text = read_to_string("src/aoc2023/texts/day5").unwrap();
     let time = Instant::now();
 
     let mut lines = text.lines();
@@ -135,7 +135,7 @@ pub fn solve() -> Solution {
         p2_seeds.sort_unstable_by_key(|range| range.start);
         join_ranges(&mut p2_seeds);
     }
-    
+
     let sol1: i64 = p1;
     let sol2: i64 = p2_seeds.first().unwrap().start - 1;
 
