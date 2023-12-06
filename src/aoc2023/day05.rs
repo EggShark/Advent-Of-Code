@@ -73,9 +73,7 @@ pub fn solve() -> Solution {
 
     p2_seeds.sort_unstable_by_key(|f| f.start);
 
-    println!("len: {}", p2_seeds.len());
     join_ranges(&mut p2_seeds);
-    println!("len: {}", p2_seeds.len());
 
     for map in maps {
         let mut next_ranges = Vec::new();
@@ -137,9 +135,7 @@ pub fn solve() -> Solution {
         p2_seeds.sort_unstable_by_key(|range| range.start);
         join_ranges(&mut p2_seeds);
     }
-
-    println!("p2 seeds: {:?}", p2_seeds);
-
+    
     let sol1: i64 = p1;
     let sol2: i64 = p2_seeds.first().unwrap().start - 1;
 
