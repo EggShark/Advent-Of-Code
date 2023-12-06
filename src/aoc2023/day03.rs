@@ -1,6 +1,5 @@
 use crate::{Solution, SolutionType};
 use std::fs::read_to_string;
-use std::iter::successors;
 use std::time::Instant;
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -80,8 +79,4 @@ pub fn solve() -> Solution {
 
 fn symbols(string: char) -> bool {
     string != '.' && !string.is_numeric()
-}
-
-fn numbers_of_digits(number: u64) -> usize {
-    successors(Some(number), |&number| (number >= 10).then(|| number/10)).count()
 }

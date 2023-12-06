@@ -1,6 +1,4 @@
 use crate::{Solution, SolutionType};
-use std::cmp::min;
-use std::ops::Range;
 use std::fs::read_to_string;
 use std::str::Lines;
 use std::time::Instant;
@@ -20,8 +18,8 @@ pub fn solve() -> Solution {
         .1
         .split_whitespace()
         .filter(|s| !s.is_empty())
-        .map(|s| s.parse::<u64>().unwrap())
-        .collect::<Vec<u64>>();
+        .map(|s| s.parse::<i64>().unwrap())
+        .collect::<Vec<i64>>();
 
     let _ = lines.next().unwrap();
     let _ = lines.next().unwrap();
@@ -64,19 +62,88 @@ pub fn solve() -> Solution {
         humidity_to_location,
     ];
 
+    maps.iter_mut().for_each(|map| map.sort_unstable_by_key(|f| f.end));
+
     for idx in (0..seeds.len()).step_by(2) {
         let start = seeds[idx];
         let to_add = seeds[idx + 1];
         let end = start + to_add;
-        p2_seeds.push(start..end)
+        p2_seeds.push(Range::new(start, end))
     }
 
-    println!("{:?}", maps[6]);
+    p2_seeds.sort_unstable_by_key(|f| f.start);
 
-    let sol1: u64 = p1;
-    let sol2: u64 = 0;
+    println!("len: {}", p2_seeds.len());
+    join_ranges(&mut p2_seeds);
+    println!("len: {}", p2_seeds.len());
 
-    let solution = (SolutionType::U64(sol1), SolutionType::U64(sol2));
+    for map in maps {
+        let mut next_ranges = Vec::new();
+        let mut range_iter = p2_seeds.iter_mut();
+        let mut translation_iter = map.iter();
+
+        let mut range = range_iter.next().unwrap();
+        let mut translation = translation_iter.next().unwrap();
+        
+        loop {
+            if range.start > translation.end {
+                if let Some(next) = translation_iter.next() {
+                    translation = next;
+                    continue;
+                } else {
+                    next_ranges.push(*range);
+                    for range in range_iter {
+                        next_ranges.push(*range);
+                    }
+                    break;
+                }
+            } else {
+                if range.start < translation.start && range.end > translation.start {
+                    next_ranges.push(Range::new(range.start, translation.start - 1));
+                    range.start = translation.start;
+                }
+
+                if range.start >= translation.start {
+                    if range.end > translation.end {
+                        next_ranges.push(Range::new(
+                            range.start + translation.offset,
+                            translation.end + translation.offset
+                        ));
+                        range.start = translation.end + 1;
+                    } else {
+                        next_ranges.push(Range::new(
+                            range.start + translation.offset,
+                            range.end + translation.offset,
+                        ));
+
+                        if let Some(next) = range_iter.next() {
+                            range = next;
+                        } else {
+                            break;
+                        }
+                    }
+                } else {
+                    next_ranges.push(*range);
+                    if let Some(next) = range_iter.next() {
+                        range = next;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        p2_seeds = next_ranges;
+        p2_seeds.sort_unstable_by_key(|range| range.start);
+        join_ranges(&mut p2_seeds);
+    }
+
+    println!("p2 seeds: {:?}", p2_seeds);
+
+    let sol1: i64 = p1;
+    let sol2: i64 = p2_seeds.first().unwrap().start - 1;
+
+    let solution = (SolutionType::I64(sol1), SolutionType::I64(sol2));
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
     Solution {
         solution,
@@ -84,33 +151,58 @@ pub fn solve() -> Solution {
     }
 }
 
-// fn move_range(seed_range: &Range<u64>, map_ranges: &[(Range<u64>, Range<u64>)]) -> Vec<Range<u64>> {
-//     let mut out = Vec::new();
-//     let start = seed_range.start;
-//     let mut current = start;
+#[derive(Clone, Copy, Debug)]
+struct Range {
+    start: i64,
+    end: i64,
+}
 
-//     for (dst, src) in map_ranges.iter().skip_while(|(_, src)| src.end < start) {
-//         if src.start > current {
-//             out.push(current..min(seed_range.end, src.start));
-//             current = src.start;
-//         }
-//         if current >= seed_range.end {
-//             break;
-//         }
-//         out.push(shift(current, dst, src)..shift(min(seed_range.end, src.end), dst, src));
-//         current = src.end;
-//         if current >= seed_range.end {
-//             break;
-//         }
-//     }
-//     if current < seed_range.end {
-//         out.push(current..seed_range.end);
-//     }
+impl Range {
+    pub fn new(start: i64, end: i64) -> Self {
+        Self {
+            start,
+            end,
+        }
+    }
+}
 
-//     out
-// }
+#[derive(Clone, Copy, Debug)]
+struct MapRange {
+    start: i64,
+    end: i64,
+    offset: i64,
+}
 
-fn make_value(lines: &mut Lines<'_>) -> Vec<(Range<u64>, Range<u64>)> {
+impl MapRange {
+    pub fn new(start: i64, end: i64, offset: i64) -> Self {
+        Self {
+            start,
+            end,
+            offset,
+        }
+    }
+}
+
+fn join_ranges(ranges: &mut Vec<Range>) {
+    let mut offset = 0;
+    let len = ranges.len() - 1;
+
+    for i in 0..len {
+        if offset + i > len {
+            break;
+        }
+        let next = ranges[i + 1 - offset];
+        let current = ranges.get_mut(i).unwrap();
+
+        if current.end >= next.start {
+            current.end = next.end;
+            ranges.remove(i + 1 - offset);
+            offset += 1;
+        }
+    }
+}
+
+fn make_value(lines: &mut Lines<'_>) -> Vec<MapRange> {
     let mut vec = Vec::new();
     while let Some(line) = lines.next() {
         if line.is_empty() {
@@ -119,30 +211,22 @@ fn make_value(lines: &mut Lines<'_>) -> Vec<(Range<u64>, Range<u64>)> {
         let mut numbers = line
             .split_whitespace()
             .filter(|s| !s.is_empty())
-            .map(|f| f.parse::<u64>().unwrap());
+            .map(|f| f.parse::<i64>().unwrap());
         let dst = numbers.next().unwrap();
         let source = numbers.next().unwrap();
         let range = numbers.next().unwrap();
-        vec.push((dst..range+dst, source..source+range));
+        vec.push(MapRange::new(source, source + range, dst-source));
     }
     vec
 }
 
-fn update_value(val: u64, ranges: &Vec<(Range<u64>, Range<u64>)>) -> u64 {
+fn update_value(val: i64, ranges: &Vec<MapRange>) -> i64 {
     let found = ranges
         .iter()
-        .find(|(_, src)| val >= src.start && val <= src.end);
+        .find(|range| val >= range.start && val <= range.end);
 
     match found {
-        Some(ranges) => shift(val,&ranges.0,&ranges.1),
+        Some(range) => val + range.offset,
         None => val
-    }
-}
-
-fn shift(num: u64, r1: &Range<u64>, r2: &Range<u64>) -> u64 {
-    if r2.start > r1.start {
-        num - (r2.start - r1.start)
-    } else {
-        num + (r1.start - r2.start)
     }
 }
