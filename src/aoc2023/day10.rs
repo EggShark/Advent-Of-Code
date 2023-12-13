@@ -42,7 +42,7 @@ pub fn solve() -> Solution {
     loop {
         steps += 1;
         
-        poly.push((current_position.0 as f64, current_position.1 as f64));
+        poly.push((current_position.0 as f32, current_position.1 as f32));
         visted_points.insert(current_position);
         
         let (x, y) = direction.to_numbers();
@@ -87,7 +87,7 @@ pub fn solve() -> Solution {
     let mut count = 0;
     for y in 0..map.len() {
         for x in 0..map[y].len() {
-            if !visted_points.contains(&(x as i32, y as i32)) && is_point_in_polygon((x as f64, y as f64), &poly) {
+            if !visted_points.contains(&(x as i32, y as i32)) && is_point_in_polygon((x as f32, y as f32), &poly) {
                 count += 1;
             }
         }
@@ -106,7 +106,7 @@ pub fn solve() -> Solution {
 }
 
 // just point in poly collision
-fn is_point_in_polygon(point: (f64, f64), polygon: &[(f64, f64)]) -> bool {
+fn is_point_in_polygon(point: (f32, f32), polygon: &[(f32, f32)]) -> bool {
     let mut is_inside = false;
     let mut j = polygon.len() - 1;
 
