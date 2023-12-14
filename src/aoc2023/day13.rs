@@ -4,7 +4,7 @@ use std::time::Instant;
 ///////////////////////////////////////////////////////////////////////////////
 
 #[cfg(target_os="windows")]
-const DOUBLE_NEW_LINE: &str = "\n\r\n\r";
+const DOUBLE_NEW_LINE: &str = "\r\n\r\n";
 
 #[cfg(not(target_os="windows"))]
 const DOUBLE_NEW_LINE: &str = "\n\n";
