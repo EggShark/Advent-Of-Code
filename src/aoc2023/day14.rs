@@ -33,13 +33,15 @@ pub fn solve() -> Solution {
                 .collect::<Vec<Tile>>()
         }).collect::<Vec<Vec<Tile>>>();
 
-    let mut seen: HashSet<String> = HashSet::new();
+    //32 ms
+
+    let mut seen: HashSet<[(usize, usize); 2016]> = HashSet::new();
     let mut cycle_found_at = 0;
     let mut count = 0;
     loop {
         spin_cylce(&mut grid);
-        let hash_str = format!("{:?}", grid);
-        if !seen.insert(hash_str.clone()) {
+        let hash_str = hash_grid(&grid);
+        if !seen.insert(hash_str) {
             if cycle_found_at == 0 {
                 cycle_found_at = count;
                 seen.clear();
@@ -87,6 +89,21 @@ impl From<char> for Tile {
             _ => unreachable!(),
         }
     }
+}
+
+fn hash_grid(grid: &Vec<Vec<Tile>>) -> [(usize, usize); 2016] {
+    let mut hash = [(0, 0); 2016];
+    let mut hash_idx = 0;
+
+    for y in 0..grid.len() {
+        for x in 0..grid[y].len() {
+            if grid[y][x] == Tile::Roller {
+                hash[hash_idx] = (x, y);
+                hash_idx += 1;
+            }
+        }
+    }
+    hash
 }
 
 fn is_occupied(tile: Tile) -> bool {
