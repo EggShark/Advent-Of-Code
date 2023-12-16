@@ -1,5 +1,5 @@
 use crate::{Solution, SolutionType};
-use std::collections::{HashSet, HashMap};
+use std::collections::HashSet;
 use std::fs::read_to_string;
 use std::time::Instant;
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,10 +104,6 @@ fn hash_grid(grid: &Vec<Vec<Tile>>) -> [(usize, usize); 2016] {
         }
     }
     hash
-}
-
-fn is_occupied(tile: Tile) -> bool {
-    matches!(tile, Tile::Blocked | Tile::Roller)
 }
 
 fn spin_cylce(grid: &mut Vec<Vec<Tile>>) {
