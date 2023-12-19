@@ -5,6 +5,11 @@ mod soultions;
 use std::env;
 use soultions::{Solution, SolutionType};
 
+#[cfg(target_os="windows")]
+const DOUBLE_NEW_LINE: &str = "\r\n\r\n";
+
+#[cfg(not(target_os="windows"))]
+const DOUBLE_NEW_LINE: &str = "\n\n";
 
 fn main() {
     let args: Vec<String> = env::args().collect();

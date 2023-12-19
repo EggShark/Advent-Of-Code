@@ -1,14 +1,7 @@
-use crate::{Solution, SolutionType};
+use crate::{Solution, SolutionType, DOUBLE_NEW_LINE};
 use std::fs::read_to_string;
 use std::time::Instant;
 ///////////////////////////////////////////////////////////////////////////////
-
-#[cfg(target_os="windows")]
-const DOUBLE_NEW_LINE: &str = "\r\n\r\n";
-
-#[cfg(not(target_os="windows"))]
-const DOUBLE_NEW_LINE: &str = "\n\n";
-
 pub fn solve() -> Solution {
     // Your solution here...
     let text = read_to_string("src/aoc2023/texts/day13").unwrap();
