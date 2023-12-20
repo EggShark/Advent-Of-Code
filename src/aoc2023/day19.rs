@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use std::fs::read_to_string;
 use std::str::Split;
 use std::time::Instant;
-use std::ops::Range;
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn solve() -> Solution {
@@ -15,8 +14,8 @@ pub fn solve() -> Solution {
 
     let instructions = instruct
         .lines()
-        .map(|line| Check::new(line))
-        .collect::<HashMap<String, Check>>();
+        .map(|line| WorkFlow::new(line))
+        .collect::<HashMap<String, WorkFlow>>();
 
     let items = items
         .lines()
@@ -28,48 +27,28 @@ pub fn solve() -> Solution {
         .collect::<Vec<Item>>();
 
     let mut sum = 0;
-
-    for item in items {
-        let mut current_instruction = instructions.get("in").unwrap();
-        'i: loop {
-            'j: for cmp in current_instruction.comparisions.iter() {
-                let out_come = match (cmp.stat, cmp.greater_than) {
-                    (Stats::Cool, true) => item.cool > cmp.number,
-                    (Stats::Cool, false) => item.cool < cmp.number,
-                    (Stats::Aero, true) => item.aero > cmp.number,
-                    (Stats::Aero, false) => item.aero < cmp.number,
-                    (Stats::Musical, true) => item.musical > cmp.number,
-                    (Stats::Musical, false) => item.musical < cmp.number,
-                    (Stats::Shiny, true) => item.shiny > cmp.number,
-                    (Stats::Shiny, false) => item.shiny < cmp.number,
-                };
-
-                let result = if out_come {
-                    &cmp.sucsess_result
-                } else {
-                    &cmp.fail_result
-                };
-
-                match result {
-                    Result::Accpected => {
-                        sum += (item.cool + item.aero + item.musical + item.shiny) as u64;
-                        break 'i;
-                    },
-                    Result::Rejected => {
-                        break 'i;
-                    },
-                    Result::GoTo(s) => {
-                        current_instruction = instructions.get(s).unwrap();
-                        break 'j;
-                    },
-                    Result::Next => continue 'j,
-                }
+    for item in items.iter() {
+        let mut current_check = instructions.get("in").unwrap();
+        loop {
+            match current_check.check(&item) {
+                Result::Accepted => {
+                    sum += (item.aero + item.cool + item.shiny + item.musical) as u64;
+                    break;
+                },
+                Result::Rejected => break,
+                Result::None => unreachable!(),
+                Result::WorkFlow(name) => current_check = instructions.get(&name).unwrap(),
             }
         }
     }
 
+    // cool musical aero shiny
+    let ranges = [Range{start: 1, end: 4000}; 4];
+
+    let p2 = instructions["in"].count_ranges(ranges, &instructions);
+
     let sol1: u64 = sum;
-    let sol2: u64 = 0;
+    let sol2: u64 = p2 as u64;
 
     let solution = (SolutionType::U64(sol1), SolutionType::U64(sol2));
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
@@ -102,99 +81,62 @@ impl Item {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-enum Result {
-    Accpected,
-    Rejected,
-    Next,
-    GoTo(String),
+#[derive(Debug)]
+struct WorkFlow {
+    rules: Vec<Rule>
+}
+
+impl WorkFlow {
+    fn new(line: &str) -> (String, Self) {
+        let (name, right) = line.split_once('{').unwrap();
+        let mut workflow = WorkFlow { rules: Vec::new() };
+        for rule in right[..right.len() - 1].split(',') {
+            workflow.rules.push(Rule::new(rule));
+        }
+        (name.into(), workflow)
+    }
+
+    fn check(&self, item: &Item) -> Result {
+        // finds first true output
+        self.rules
+            .iter()
+            .map(|rule| rule.eval(item))
+            .find(|result| !matches!(result, Result::None))
+            .unwrap()
+    }
+
+    fn count_ranges(&self, mut items: [Range; 4], instructions: &HashMap<String, WorkFlow>) -> i64 {
+        let mut count = 0;
+        for rule in self.rules.iter() {
+            let (c, new_ranges) = rule.eval_range(items, instructions);
+            count += c;
+            items = new_ranges;
+        }
+
+        count
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct Range {
+    start: i64,
+    end: i64,
+}
+
+impl Range {
+    fn value(&self) -> i64 {
+        (self.end-self.start + 1).max(0)
+    }
+
+    fn product(ranges: [Range; 4]) -> i64 {
+        ranges  
+            .iter()
+            .map(|r| r.value())
+            .product()
+    }
 }
 
 #[derive(Debug)]
-struct Check {
-    comparisions: Vec<Compare>,
-}
-
-impl Check {
-    fn new(line: &str) -> (String, Self) {
-        let (name, right) = line.split_once('{').unwrap();
-        let mut comparisions = Vec::new();
-        Compare::new(&mut comparisions, &right[0..right.len()]);
-        (
-            name.to_string(),
-            Self {
-                comparisions,
-            }
-        )
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-struct Compare {
-    number: u32,
-    stat: Stats,
-    greater_than: bool,
-    sucsess_result: Result,
-    fail_result: Result,
-}
-
-impl Compare {
-    fn new(vec: &mut Vec<Compare>, string: &str) {
-        let (comp, right) = string.split_once(':').unwrap();
-        let stat = match &comp[0..1] {
-            "a" => Stats::Aero,
-            "x" => Stats::Cool,
-            "m" => Stats::Musical,
-            "s" => Stats::Shiny,
-            _ => unreachable!(),
-        };
-        let greater_than = &comp[1..2] == ">";
-        let number: u32 = comp[2..].parse().unwrap();
-        let (first_result, second_result) = right.split_once(',').unwrap();
-        
-        let sucsess_result = if &first_result[0..1] == "A" {
-            Result::Accpected
-        } else if &first_result[0..1] == "R" {
-            Result::Rejected
-        } else {
-            Result::GoTo(first_result.to_string())
-        };
-
-        let fail_result = if &second_result[0..1] == "A" {
-            Result::Accpected
-        } else if &second_result[0..1] == "R" {
-            Result::Rejected
-        } else if &second_result[1..2] == ">" || &second_result[1..2] == "<" {
-            Result::Next
-        } else {
-            if &second_result[second_result.len()-1..second_result.len()] == "}" {
-                Result::GoTo(second_result[0..second_result.len()-1].to_string())
-            } else {
-                Result::GoTo(second_result[0..second_result.len()].to_string())
-            }
-        };
-
-        if fail_result == Result::Next {
-            vec.push(Self {
-                number,
-                stat,
-                greater_than,
-                sucsess_result,
-                fail_result,
-            });
-            Compare::new(vec, second_result);
-        } else {
-            vec.push(Self {
-                number,
-                stat,
-                greater_than,
-                sucsess_result,
-                fail_result,
-            });
-        }
-    }
-}
-
 enum Rule {
     LessThan(Stats, u32, String),
     GreaterThan(Stats, u32, String),
@@ -215,15 +157,126 @@ impl Rule {
 
             let value: u32 = cond[2..].parse().unwrap();
             if bytes[1] == b'<' {
-
+                Self::LessThan(stat, value, name.into())
+            } else {
+                Self::GreaterThan(stat, value, name.into())
             }
-
-            todo!();
-
         } else {
             Self::NoOp(s.into())
         }
     }
+
+    fn eval(&self, item: &Item) -> Result {
+        match self {
+            Self::NoOp(s) => {
+                match s.as_str() {
+                    "R" => Result::Rejected,
+                    "A" => Result::Accepted,
+                    name => Result::WorkFlow(name.to_string()),
+                }
+            },
+            Self::LessThan(kind, value, where_to) => {
+                let s = match kind {
+                    Stats::Aero => item.aero < *value,
+                    Stats::Cool => item.cool < *value,
+                    Stats::Musical => item.musical < *value,
+                    Stats::Shiny => item.shiny < *value,
+                };
+                if s {
+                    match where_to.as_str() {
+                        "A" => Result::Accepted,
+                        "R" => Result::Rejected,
+                        _ => Result::WorkFlow(where_to.to_string())
+                    }
+                } else {
+                    Result::None
+                }
+            }
+            Self::GreaterThan(kind, value, where_to) => {
+                let s = match kind {
+                    Stats::Aero => item.aero > *value,
+                    Stats::Cool => item.cool > *value,
+                    Stats::Musical => item.musical > *value,
+                    Stats::Shiny => item.shiny > *value,
+                };
+                if s {
+                    match where_to.as_str() {
+                        "A" => Result::Accepted,
+                        "R" => Result::Rejected,
+                        _ => Result::WorkFlow(where_to.to_string())
+                    }
+                } else {
+                    Result::None
+                }
+            }
+        }
+    }
+
+    fn eval_range(&self, mut ranges: [Range; 4], instructions: &HashMap<String, WorkFlow>) -> (i64, [Range; 4]) {
+        match self {
+            Rule::LessThan(stat, value, where_to) => {
+                let range: Range = ranges[usize::from(stat)];
+                // spliting the range if the value is in the middle (smaller than the end of the part range)
+                // we take that as our new max
+                let (matched_start, matched_end) = (range.start, range.end.min(*value as i64 - 1));
+                let mut matched_ranges = ranges;
+
+                // splits the ranges
+                matched_ranges[usize::from(stat)] = Range{start: matched_start, end: matched_end};
+                ranges[usize::from(stat)] = Range{start: range.start.max(*value as i64), end: range.end};
+                if where_to == "A" {
+                    // all the parts < N made it woo hoo, so all the other ranges still need to be checked
+                    (Range::product(matched_ranges), ranges)
+                } else if where_to == "R" {
+                    // all the parts < N are invalid, but we still can sheck all the parts > N :)
+                    (0, ranges)
+                } else {
+                    // all the ranges < N move on to whats next the rest we'll buble up
+                    (instructions[where_to].count_ranges(matched_ranges, instructions), ranges)
+                }
+            },
+            Rule::GreaterThan(stat, value, where_to) => {
+                let range: Range = ranges[usize::from(stat)];
+                // spliting the range if the value is in the middle (smaller than the end of the part range)
+                // we take that as our new max
+                let (matched_start, matched_end) = (range.start.max(*value as i64 + 1), range.end);
+                let mut matched_ranges = ranges;
+
+                // splits the ranges
+                matched_ranges[usize::from(stat)] = Range{start: matched_start, end: matched_end};
+                ranges[usize::from(stat)] = Range{start: range.start, end: range.end.min(*value as i64)};
+                if where_to == "A" {
+                    // all the parts > N made it woo hoo, so all the other ranges still need to be checked
+                    (Range::product(matched_ranges), ranges)
+                } else if where_to == "R" {
+                    // all the parts > N are invalid, but we still can sheck all the parts > N :)
+                    (0, ranges)
+                } else {
+                    // all the ranges > N move on to whats next the rest we'll buble up
+                    (instructions[where_to].count_ranges(matched_ranges, instructions), ranges)
+                }
+            }
+            Rule::NoOp(where_to) => {
+                // the whole range either makes it or it doesnt
+                if where_to == "A" {
+                    (Range::product(ranges), Default::default())
+                } else if where_to == "R" {
+                    (0, Default::default())
+                } else {
+                    (instructions[where_to].count_ranges(ranges, instructions), Default::default())
+                }
+            }
+        }
+
+        // todo!()
+    }
+}
+
+enum Result {
+    WorkFlow(String),
+    Accepted,
+    Rejected,
+    None,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -232,4 +285,15 @@ enum Stats {
     Musical,
     Aero,
     Shiny,
+}
+
+impl From<&Stats> for usize {
+    fn from(value: &Stats) -> Self {
+        match value {
+            Stats::Cool => 0,
+            Stats::Musical => 1,
+            Stats::Aero => 2,
+            Stats::Shiny => 3,
+        }
+    }
 }
