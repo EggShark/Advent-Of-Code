@@ -43,7 +43,8 @@ pub fn solve() -> Solution {
 
     // test input is in order however reall input is not so sort by Z to have lowest bricks at the start?
     bricks.sort_by_key(|a| a.start.z);
-    drop_bricks(&mut bricks);
+    drop_bricks(&mut bricks, 0);
+    bricks.sort_by_key(|a| a.start.z);
 
     let mut disintegrate_count = 0;
     for brick in bricks.iter() {
@@ -58,7 +59,7 @@ pub fn solve() -> Solution {
     for idx in 0..bricks.len() {
         let mut copy = bricks.clone();
         copy.remove(idx);
-        let count_dropped = drop_bricks(&mut copy);
+        let count_dropped = drop_bricks(&mut copy, idx);
         chains += count_dropped as u64;
     }
 
@@ -74,9 +75,9 @@ pub fn solve() -> Solution {
     }
 }
 
-fn drop_bricks(bricks: &mut [Brick]) -> u32 {
+fn drop_bricks(bricks: &mut [Brick], start: usize) -> u32 {
     let mut count = 0;
-    for idx in 0..bricks.len() {
+    for idx in start..bricks.len() {
         let current_start = bricks[idx].start;
         let current_end = bricks[idx].end;
 
