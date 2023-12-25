@@ -83,10 +83,10 @@ pub fn solve() -> Solution {
 struct Particle {
     x: i128,
     y: i128,
-    z: i128,
+    _z: i128,
     vx: i128,
     vy: i128,
-    vz: i128,
+    _vz: i128,
     a: i128,
     b: i128,
     c: i128
@@ -97,10 +97,10 @@ impl Particle {
         Self {
             x,
             y,
-            z,
+            _z: z,
             vx,
             vy,
-            vz,
+            _vz: vz,
             a: vy,
             b: -vx,
             c: vy * x - vx * y,
