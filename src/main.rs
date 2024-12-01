@@ -1,5 +1,6 @@
 mod aoc2022;
 mod aoc2023;
+mod aoc2024;
 mod soultions;
 
 use std::env;
@@ -18,7 +19,7 @@ fn main() {
     }
 
     let year = args[1].parse::<u16>().unwrap();
-    assert!(year >= 2022 && year <= 2023);
+    assert!(year >= 2022 && year <= 2024);
 
     let days: Vec<u8> = args[2..].iter()
         .map(|x| x.parse().unwrap_or_else(|v| panic!("Not a valid day: {}", v)))
@@ -27,6 +28,7 @@ fn main() {
     match year {
         2022 => aoc2022::run(&days),
         2023 => aoc2023::run(&days),
+        2024 => aoc2024::run(&days),
         _ => unimplemented!(),
     }
 }
