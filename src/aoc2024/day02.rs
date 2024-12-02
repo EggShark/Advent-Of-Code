@@ -14,13 +14,10 @@ pub fn solve() -> Solution {
         .map(|line| line.split(' ')
             .map(|num| num.parse::<i32>().unwrap())
             .collect::<Vec<i32>>()
-        )
-        .map(|line| line
             .windows(3)
             .map(|slice| (slice[0] - slice[1], slice[1] - slice[2]))
-            .filter(|(val1, val2)| (val1.is_negative() == val2.is_negative() && i32::abs(*val1) >= 1 && i32::abs(*val1) <= 3 && i32::abs(*val2) >= 1 && i32::abs(*val2) <= 3) == false)
-            .count()
-        ).filter(|count| *count == 0)
+            .all(|(val1, val2)| (val1.is_negative() == val2.is_negative() && i32::abs(val1) >= 1 && i32::abs(val1) <= 3 && i32::abs(val2) >= 1 && i32::abs(val2) <= 3))
+        ).filter(|all| *all)
         .count();
 
     let input = text.
@@ -32,33 +29,18 @@ pub fn solve() -> Solution {
 
     let mut count_p2 = 0;
     for line in input {
-        let mut is_valid = true;
         let prev_decrease = line[0] > line[1];
         let mut bad_level = 0;
         for i in 0..line.len() - 1 {
             let diff = line[i] - line[i + 1];
-            if line[i] < line[i + 1] && prev_decrease {
+            if (line[i] < line[i + 1] && prev_decrease)
+                || (line[i] > line[i + 1] && !prev_decrease)
+                || i32::abs(diff) > 3 || i32::abs(diff) < 1 {
                 bad_level += 1;
-                is_valid = false;
-                continue;
-            }
-
-            if line[i] > line[i + 1] && !prev_decrease {
-                is_valid = false;
-                bad_level += 1;
-                continue;
-            }
-
-            if i32::abs(diff) > 3 || i32::abs(diff) < 1 {
-                bad_level += 1;
-                is_valid = false;
-                continue;
             }
         }
 
-        if is_valid {
-            count_p2 += 1;
-        } else if bad_level <= 1 {
+        if bad_level <= 1{
             count_p2 += 1;
         }
     }
