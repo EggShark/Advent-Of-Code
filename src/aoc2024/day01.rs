@@ -17,22 +17,22 @@ pub fn solve() -> Solution {
         right.push(right_s.parse().unwrap());
     }
 
-    let mut part_2_sum: u64 = 0;
-    for num in left.iter() {
-        let count = right.iter().filter(|right_num| *right_num == num).count();
-        part_2_sum += count as u64 * *num as u64;
-    }
+    let part_2_sum: u64 = left
+        .iter()
+        .map(|num| (num, right.iter().filter(|right_num| * right_num == num).count()))
+        .map(|(num, count)| count as u64 * *num as u64)
+        .sum();
 
     left.sort();
     right.sort();
 
-    let mut sum: i32 = 0;
+    let part_1 = left
+        .into_iter()
+        .zip(right.into_iter())
+        .map(|(left_n, right_n)| i32::abs(left_n - right_n) as u64)
+        .sum();
 
-    for (left_i, right_i) in left.iter().zip(right.iter()) {
-        sum += i32::abs(left_i - right_i);
-    }
-
-    let sol1: u64 = sum as u64;
+    let sol1: u64 = part_1;
     let sol2: u64 = part_2_sum;
 
     let solution = (SolutionType::U64(sol1), SolutionType::U64(sol2));
