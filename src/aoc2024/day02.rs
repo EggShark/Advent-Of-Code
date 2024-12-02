@@ -8,12 +8,28 @@ pub fn solve() -> Solution {
     let text = read_to_string("src/aoc2024/inputs/day2").unwrap();
     let time = Instant::now();
 
-    let input = text.
+    
+    let count_p1 = text.
         lines()
-        .map(|line| line.split(' ').map(|num| num.parse::<i32>().unwrap()).collect::<Vec<i32>>())
-        .collect::<Vec<Vec<i32>>>();
+        .map(|line| line.split(' ')
+            .map(|num| num.parse::<i32>().unwrap())
+            .collect::<Vec<i32>>()
+        )
+        .map(|line| line
+            .windows(3)
+            .map(|slice| (slice[0] - slice[1], slice[1] - slice[2]))
+            .filter(|(val1, val2)| (val1.is_negative() == val2.is_negative() && i32::abs(*val1) >= 1 && i32::abs(*val1) <= 3 && i32::abs(*val2) >= 1 && i32::abs(*val2) <= 3) == false)
+            .count()
+        ).filter(|count| *count == 0)
+        .count();
 
-    let mut count = 0;
+    let input = text.
+    lines()
+    .map(|line| line.split(' ')
+        .map(|num| num.parse::<i32>().unwrap())
+        .collect::<Vec<i32>>()
+    ).collect::<Vec<Vec<i32>>>();
+
     let mut count_p2 = 0;
     for line in input {
         let mut is_valid = true;
@@ -41,16 +57,14 @@ pub fn solve() -> Solution {
         }
 
         if is_valid {
-            println!("valid line: {:?}", line);
-            count += 1;
             count_p2 += 1;
         } else if bad_level <= 1 {
             count_p2 += 1;
         }
     }
 
-    let sol1: u64 = count;
-    let sol2: u64 = count_p2;;
+    let sol1: u64 = count_p1 as u64;
+    let sol2: u64 = count_p2;
 
     let solution = (SolutionType::U64(sol1), SolutionType::U64(sol2));
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
