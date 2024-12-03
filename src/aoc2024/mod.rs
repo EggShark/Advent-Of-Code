@@ -45,8 +45,8 @@ fn solve_day(day: u8, part1: fn(&str) -> Solve, part2: fn(&str) -> Solve) -> f64
     let p2 = part2(&text);
     println!("\n=== Day {:02} ===", day);
     println!("  . Part 1:      {}", p1.solution);
-    println!("  . Part 1 Time: {:.4} ms", p1.time_ms);
     println!("  . Part 2:      {}", p2.solution);
+    println!("  . Part 1 Time: {:.4} ms", p1.time_ms);
     println!("  . Part 2 Time: {:.4} ms", p2.time_ms);
     println!("Total time for Day {:02}: {:.4} ms", day, p1.time_ms + p2.time_ms);
 
