@@ -1,16 +1,10 @@
-use crate::{Solution, SolutionType};
-use std::fs::read_to_string;
 use std::time::Instant;
-///////////////////////////////////////////////////////////////////////////////
+use crate::Solve;
 
-pub fn solve() -> Solution {
-    // Your solution here...
-    let text = read_to_string("src/aoc2024/inputs/day2").unwrap();
+pub fn part1(data_in: &str) -> Solve {
     let time = Instant::now();
-
-    
-    let count_p1 = text.
-        lines()
+    let solve = data_in
+        .lines()
         .map(|line| line.split(' ')
             .map(|num| num.parse::<i32>().unwrap())
             .collect::<Vec<i32>>()
@@ -20,14 +14,25 @@ pub fn solve() -> Solution {
         ).filter(|all| *all)
         .count();
 
-    let input = text.
+
+    let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
+    Solve {
+        solution: Box::new(solve),
+        time_ms,
+    }
+}
+
+pub fn part2(data_in: &str) -> Solve {
+    let time = Instant::now();
+
+    let input = data_in.
     lines()
     .map(|line| line.split(' ')
         .map(|num| num.parse::<i32>().unwrap())
         .collect::<Vec<i32>>()
     ).collect::<Vec<Vec<i32>>>();
 
-    let mut count_p2 = 0;
+    let mut solve = 0;
     for line in input {
         let prev_decrease = line[0] > line[1];
         let mut bad_level = 0;
@@ -41,17 +46,14 @@ pub fn solve() -> Solution {
         }
 
         if bad_level <= 1{
-            count_p2 += 1;
+            solve += 1;
         }
     }
 
-    let sol1: u64 = count_p1 as u64;
-    let sol2: u64 = count_p2;
 
-    let solution = (SolutionType::U64(sol1), SolutionType::U64(sol2));
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
-    Solution {
-        solution,
+    Solve {
+        solution: Box::new(solve),
         time_ms,
     }
 }

@@ -1,6 +1,6 @@
-use std::time::Instant;
 use crate::Solve;
-///////////////////////////////////////////////////////////////////////////////
+
+use std::time::Instant;
 
 pub fn part1(data_in: &str) -> Solve {
     let time = Instant::now();

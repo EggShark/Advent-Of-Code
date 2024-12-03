@@ -4,7 +4,7 @@ mod aoc2024;
 mod soultions;
 
 use std::env;
-use soultions::{Solution, SolutionType};
+use soultions::{Solution, SolutionType, Solve};
 
 #[cfg(target_os="windows")]
 const DOUBLE_NEW_LINE: &str = "\r\n\r\n";
