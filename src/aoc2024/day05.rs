@@ -13,14 +13,14 @@ pub fn part1(data_in: &str) -> Solve {
     }
 
     let solve: u32 = order.lines()
-    .map(|line| {
+    .filter_map(|line| {
         let line = line
             .split(',')
             .map(|i| i.parse::<u16>().unwrap())
             .collect::<Vec<_>>();
 
         let mut valid = true;
-        for i in 1..line.len() {
+        'o: for i in 1..line.len() {
             let rule = rules.get(&line[i]);
             if rule.is_none() {
                 continue;
@@ -32,18 +32,17 @@ pub fn part1(data_in: &str) -> Solve {
                 if rule.contains(&line[x]) {
                     //println!("found: {}, violating rule {}:{:?}", line[x], line[i], rule);
                     valid = false;
-                    break;
+                    break 'o;
                 }
-            }
-
-            if !valid {
-                break;
             }
         }
 
-        (valid, line[line.len() / 2] as u32)
-    }).filter(|(valid, _)| *valid)
-    .map(|(_, value)| value)
+        if valid {
+            Some(line[line.len() / 2] as u32)
+        } else {
+            None
+        }
+    })
     .sum();
 
 
@@ -66,7 +65,7 @@ pub fn part2(data_in: &str) -> Solve {
     }
 
     let solve: u32 = order.lines()
-    .map(|line| {
+    .filter_map(|line| {
         let mut line = line
             .split(',')
             .map(|i| i.parse::<u16>().unwrap())
@@ -89,8 +88,12 @@ pub fn part2(data_in: &str) -> Solve {
             }
         }
 
-        (valid, line[line.len() / 2] as u32)
-    }).filter_map(|(valid, value)| if !valid {Some(value)} else {None})
+        if valid {
+            None
+        } else {
+            Some(line[line.len() / 2] as u32)
+        }
+    })
     .sum();
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
