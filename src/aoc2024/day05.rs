@@ -30,7 +30,6 @@ pub fn part1(data_in: &str) -> Solve {
 
             for x in 0..i {
                 if rule.contains(&line[x]) {
-                    //println!("found: {}, violating rule {}:{:?}", line[x], line[i], rule);
                     valid = false;
                     break 'o;
                 }
