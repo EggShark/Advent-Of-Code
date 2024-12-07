@@ -10,7 +10,6 @@ pub fn part1(data_in: &str) -> Solve {
         .map(|line| line.as_bytes().into_iter().map(|b| Tile::from(*b)).collect::<Vec<Tile>>())
         .collect::<Vec<Vec<Tile>>>();
 
-    let mut dir = Direction::Up;
     let mut pos: (i32, i32) = (0, 0);
 
     for y in 0..grid.len() {

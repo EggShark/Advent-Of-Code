@@ -2,6 +2,7 @@ mod aoc2022;
 mod aoc2023;
 mod aoc2024;
 mod soultions;
+mod shared;
 
 use std::env;
 use soultions::{Solution, SolutionType, Solve};
