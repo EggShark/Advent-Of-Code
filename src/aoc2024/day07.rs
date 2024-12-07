@@ -60,5 +60,5 @@ fn try_p2(wanted: u64, numbers: &[u64], current_result: u64) -> bool {
 
     try_p2(wanted, &numbers[1..], current_result + numbers[0])
         || try_p2(wanted, &numbers[1..], current_result * numbers[0])
-        || try_p2(wanted, &numbers[1..], format!("{}{}",current_result,numbers[0]).parse().unwrap())
+        || try_p2(wanted, &numbers[1..], (current_result * (10_u64.pow(numbers[0].ilog10() + 1))) + numbers[0])
 }
