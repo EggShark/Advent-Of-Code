@@ -36,7 +36,7 @@ pub fn run(days: &[u8]) {
         runtime += solve_day(*day, p1, p2);
     }
 
-    println!("Total runtime: {:.4} ms", runtime);
+    println!("\nTotal runtime: {:.4} ms", runtime);
 }
 
 fn solve_day(day: u8, part1: fn(&str) -> Solve, part2: fn(&str) -> Solve) -> f64 {

@@ -5,8 +5,8 @@ use std::{collections::{HashMap, HashSet}, time::Instant};
 pub fn part1(data_in: &str) -> Solve {
     let time = Instant::now();
 
-    // its square
-    let size = data_in.lines().count();
+    // assuming square input
+    let size = (data_in.len() as f64).sqrt() as i32;
 
     let mut positions: HashMap<u8, Vec<(i32, i32)>> = HashMap::new();
     for (y, line) in data_in.lines().enumerate() {
@@ -27,11 +27,11 @@ pub fn part1(data_in: &str) -> Solve {
                 let dx = x1 - x2;
                 let dy = y1 - y2;
 
-                if x1 + dx >= 0 && x1 + dx < size as i32 && y1 + dy >= 0 && y1 + dy < size as i32 {
+                if x1 + dx >= 0 && x1 + dx < size && y1 + dy >= 0 && y1 + dy < size {
                     antinodes.insert((x1 + dx, y1 + dy));
                 }
 
-                if x2 - dx >= 0 && x2 - dx < size as i32 && y2 - dy >= 0 && y2 - dy < size as i32 {
+                if x2 - dx >= 0 && x2 - dx < size && y2 - dy >= 0 && y2 - dy < size {
                     antinodes.insert((x2 - dx, y2 - dy));
                 }
             }
@@ -47,11 +47,9 @@ pub fn part1(data_in: &str) -> Solve {
 
 pub fn part2(data_in: &str) -> Solve {
     let time = Instant::now();
-    let solve = 0;
 
-
-    let size = data_in.lines().count();
-
+    // assuming sqaure input
+    let size = (data_in.len() as f64).sqrt() as i32;
     let mut positions: HashMap<u8, Vec<(i32, i32)>> = HashMap::new();
     for (y, line) in data_in.lines().enumerate() {
         for (x, char) in line.bytes().enumerate() {
@@ -73,7 +71,7 @@ pub fn part2(data_in: &str) -> Solve {
 
                 let mut mult = 0;
                 loop {
-                    if x1 + (dx * mult) >= 0 && x1 + (dx * mult) < size as i32 && y1 + (dy * mult) >= 0 && y1 + (dy * mult) < size as i32 {
+                    if x1 + (dx * mult) >= 0 && x1 + (dx * mult) < size && y1 + (dy * mult) >= 0 && y1 + (dy * mult) < size {
                         antinodes.insert((x1 + dx * mult, y1 + dy * mult));
                     } else {
                         break;
@@ -84,7 +82,7 @@ pub fn part2(data_in: &str) -> Solve {
                 mult = 0;
 
                 loop {
-                    if x2 - (dx * mult) >= 0 && x2 - (dx * mult) < size as i32 && y2 - (dy * mult) >= 0 && y2 - (dy * mult) < size as i32 {
+                    if x2 - (dx * mult) >= 0 && x2 - (dx * mult) < size && y2 - (dy * mult) >= 0 && y2 - (dy * mult) < size {
                         antinodes.insert((x2 - dx * mult, y2 - dy * mult));
                     } else {
                         break;
