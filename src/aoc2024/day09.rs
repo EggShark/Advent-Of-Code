@@ -1,20 +1,24 @@
 use crate::Solve;
-use std::{time::Instant};
+use std::time::Instant;
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn part1(data_in: &str) -> Solve {
     let time = Instant::now();
-    let solve = 0;
     let mut id = 0;
-
     let mut data: Vec<Option<u32>> = Vec::new();
-    data_in.bytes().map(|b| byte_char_to_num(b)).enumerate().for_each(|(idx, b)| {
-        if idx % 2 == 0 {
-            (0..b).for_each(|_| data.push(Some(id)));
-            id += 1;
-        } else {
-            (0..b).for_each(|_| data.push(None));
-        }
+    
+    data_in
+        .bytes()
+        .map(|b| byte_char_to_num(b))
+        .enumerate()
+        .filter(|(_, b)| *b > 0)
+        .for_each(|(idx, b)| {
+            if idx % 2 == 0 {
+                (0..b).for_each(|_| data.push(Some(id)));
+                id += 1;
+            } else {
+                (0..b).for_each(|_| data.push(None));
+            }
     });
 
     let mut i = 0;
@@ -48,16 +52,18 @@ pub fn part1(data_in: &str) -> Solve {
 
 pub fn part2(data_in: &str) -> Solve {
     let time = Instant::now();
-    let solve = 0;
 
-    let mut data: Vec<(Block, usize)> = Vec::new();
-    data_in.bytes().map(|b| byte_char_to_num(b)).enumerate().for_each(|(idx, b)| {
-        if idx % 2 == 0 {
-            data.push((Block::File(idx / 2), b as usize));
-        } else {
-            data.push((Block::Empty, b as usize));
-        }
-    });
+    let mut data = data_in.bytes()
+        .map(|b| byte_char_to_num(b))
+        .enumerate()
+        .filter(|(_, b)| *b > 0)
+        .map(|(idx, b)| {
+            if idx % 2 == 0 {
+                (Block::File(idx / 2), b as usize)
+            } else {
+                (Block::Empty, b as usize)
+            }
+        }).collect::<Vec<_>>();
 
     let mut idx = 0;
     loop {
@@ -131,13 +137,4 @@ fn byte_char_to_num(byte: u8) -> u8 {
 enum Block {
     Empty,
     File(usize)
-}
-
-impl Block {
-    fn unwrap(self) -> usize {
-        match self {
-            Self::File(d) => d,
-            _ => panic!(),
-        }
-    }
 }
