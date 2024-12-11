@@ -3,15 +3,6 @@ use std::{collections::{HashSet, VecDeque}, time::Instant};
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn part1(data_in: &str) -> Solve {
-//     let data_in = "89010123
-// 78121874
-// 87430965
-// 96549874
-// 45678903
-// 32019012
-// 01329801
-// 10456732";
-
     let time = Instant::now();
     
     // assumes square input
@@ -26,8 +17,6 @@ pub fn part1(data_in: &str) -> Solve {
         for x in 0..map_size {
             if map[y][x] == 0 {
                 let mut queue = VecDeque::new();
-                let mut nines_seen = 0;
-
                 queue.push_back((x as i32, y as i32));
 
                 while !queue.is_empty() {
