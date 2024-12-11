@@ -27,20 +27,42 @@ pub mod day25;
 use std::fs;
 use crate::Solve;
 
-pub fn run(days: &[u8]) {
+pub fn bench(days: &[u8], test: bool) {
+    for day in days {
+        let mut time_p1 = 0.0;
+        let mut time_p2 = 0.0;
+        let text: String = fs::read_to_string(format!("src/aoc2024/inputs/{}/day{day}", if test {"test"} else {"real"})).unwrap();
+        
+        //todo multithread
+        for _ in 0..10 {
+            let (p1, p2) = get_funcs(*day);
+            time_p1 += p1(&text).time_ms;
+            time_p2 += p2(&text).time_ms;
+        }
+
+        let p1_average = time_p1 / 10.0;
+        let p2_average = time_p2 / 10.0;
+
+        println!("\n=== day {:0} ===", day);
+        println!(" - Average Part 1 time: {:.4} ms", p1_average);
+        println!(" - Average Part 2 time: {:.4} ms", p2_average);
+    }
+}
+
+pub fn run(days: &[u8], test: bool) {
     let mut runtime = 0.0;
 
     for day in days {
         let (p1, p2) = get_funcs(*day);
     
-        runtime += solve_day(*day, p1, p2);
+        runtime += solve_day(*day, test, p1, p2);
     }
 
     println!("\nTotal runtime: {:.4} ms", runtime);
 }
 
-fn solve_day(day: u8, part1: fn(&str) -> Solve, part2: fn(&str) -> Solve) -> f64 {
-    let text: String = fs::read_to_string(format!("src/aoc2024/inputs/day{day}")).unwrap();
+fn solve_day(day: u8, test: bool, part1: fn(&str) -> Solve, part2: fn(&str) -> Solve) -> f64 {
+    let text: String = fs::read_to_string(format!("src/aoc2024/inputs/{}/day{day}", if test {"test"} else {"real"})).unwrap();
     let p1 = part1(&text);
     let p2 = part2(&text);
     println!("\n=== Day {:02} ===", day);
