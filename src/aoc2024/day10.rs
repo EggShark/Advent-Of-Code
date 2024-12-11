@@ -21,47 +21,38 @@ pub fn part1(data_in: &str) -> Solve {
         l.bytes().map(|b| byte_char_to_num(b)).collect::<Vec<_>>()
     }).collect::<Vec<Vec<_>>>();
     
-    
-    let mut starting_pos = Vec::new();
+    let mut ends = HashSet::new();
     for y in 0..map_size {
         for x in 0..map_size {
             if map[y][x] == 0 {
-                starting_pos.push((x as i32, y as i32));
-            }
-        }
-    }
-    
-    
-    let mut solve = 0;
-    for (start_x, start_y) in starting_pos {
-        let mut queue = VecDeque::new();
-        let mut seen = HashSet::new();
-        let mut nines_seen = 0;
+                let mut queue = VecDeque::new();
+                let mut nines_seen = 0;
 
-        queue.push_back((start_x, start_y));
-        seen.insert((start_x, start_y));
+                queue.push_back((x as i32, y as i32));
 
-        while !queue.is_empty() {
-            let (search_x, search_y) = queue.pop_front().unwrap();
-            for (dx, dy) in [(1,0), (0,1), (-1, 0), (0, -1)] {
-                if search_x + dx >= 0 && search_x + dx < map_size as i32
-                    && search_y + dy >= 0 && search_y + dy < map_size as i32
-                    && map[(search_y + dy) as usize][(search_x + dx) as usize] as i16 - map[search_y as usize][search_x as usize] as i16 == 1 
-                    && seen.insert((search_x + dx, search_y + dy)) {
-                        if map[(search_y + dy) as usize][(search_x + dx) as usize] == 9 {
-                            nines_seen += 1;
+                while !queue.is_empty() {
+                    let (search_x, search_y) = queue.pop_front().unwrap();
+                    for (dx, dy) in [(1,0), (0,1), (-1, 0), (0, -1)] {
+                        if search_x + dx >= 0 && search_x + dx < map_size as i32
+                            && search_y + dy >= 0 && search_y + dy < map_size as i32
+                            && map[(search_y + dy) as usize][(search_x + dx) as usize] as i16 - map[search_y as usize][search_x as usize] as i16 == 1 
+                        {
+                            if map[(search_y + dy) as usize][(search_x + dx) as usize] == 9 {
+                                ends.insert((search_x + dx, search_y + dy));
+                            }
+
+                            queue.push_back((search_x + dx, search_y + dy));
                         }
-                        queue.push_back((search_x + dx, search_y + dy));
+                    }
                 }
             }
         }
-        solve += nines_seen;
     }
-
+    
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
     Solve {
-        solution: Box::new(solve),
+        solution: Box::new(ends.len()),
         time_ms,
     }
 }
@@ -93,8 +84,9 @@ pub fn part2(data_in: &str) -> Solve {
                             if map[(search_y + dy) as usize][(search_x + dx) as usize] == 9 {
                                 solve += 1;
                             }
+
                             stack.push((search_x + dx, search_y + dy));
-                    }
+                        }
                     }
                 }
             }
