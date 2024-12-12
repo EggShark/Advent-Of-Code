@@ -19,39 +19,28 @@ pub fn part1(data_in: &str) -> Solve {
             }
 
             let mut queue = VecDeque::new();
-            let mut seen = HashSet::new();
             queue.push_back((x as i32, y as i32));
-            seen.insert((x as i32, y as i32));
             let mut area = 0;
             let mut perimiter = 0;
             let c = grid[y][x];
 
-            while !queue.is_empty() {
-                let (sx, sy) = queue.pop_back().unwrap();
+            while let Some((sx, sy)) = queue.pop_back() {
                 area += 1;
 
-                if sx == 0 || sx as usize == grid.len() - 1 {
-                    perimiter += 1;
-                }
 
-                if sy == 0 || sy as usize == grid.len() - 1 {
-                    perimiter += 1;
-                }
-
+                let mut neigboor_count = 0;
                 for (dy, dx) in [(0, -1), (0, 1), (-1, 0), (1, 0)] {
                     if sx + dx >= 0 && sy + dy >= 0
                     && sx + dx < grid.len() as i32 && sy + dy < grid.len() as i32
+                    && grid[(sy + dy) as usize][(sx + dx) as usize] == c 
                     {
-                        if grid[(sy + dy) as usize][(sx + dx) as usize] != c {
-                            perimiter += 1;
-                        }
-                        
-                        if grid[(sy + dy) as usize][(sx + dx) as usize] == c && seen.insert((sx + dx, sy + dy)) {
+                        neigboor_count += 1;
+                        if global_seen.insert((sx + dx, sy + dy)) {
                             queue.push_back((sx + dx, sy+dy));
-                            global_seen.insert((sx + dx, sy + dy));
                         }
                     }
                 }
+                perimiter += 4 - neigboor_count;
             }
             solve += area * perimiter;
         }
