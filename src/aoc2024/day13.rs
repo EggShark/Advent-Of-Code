@@ -7,11 +7,23 @@ pub fn part1(data_in: &str) -> Solve {
 
     let buttons: i64 = data_in.split(DOUBLE_NEW_LINE).map(|s| Machine::from_str(s).unwrap())
     .map(|b| {
+        // determinate of original matrix
+        // [x1, x2]
+        // [y1, y2]
         let det = b.button_one.0 * b.button_two.1 - b.button_two.0 * b.button_one.1;
+        // determinate to solve for c1
+        // [px, x2]
+        // [py, y2]
         let d1 = b.prize.0 * b.button_two.1 - b.button_two.0 * b.prize.1;
+        // determinate to solve for c2
+        // [x1, px]
+        // [y1, py]
         let d2 = b.button_one.0 * b.prize.1 - b.prize.0 * b.button_one.1;
 
+        // checks for positive integer answer
         if d1 % det == 0 && d2 % det == 0 && d1/det >= 0 && d2/det >= 0 {
+            // cramers rule says to get nth unknown we can divide the determinate
+            // where the nth colloum is replaced by prize matrix       
             3 * (d1 / det) + (d2 / det)
         } else {
             0
