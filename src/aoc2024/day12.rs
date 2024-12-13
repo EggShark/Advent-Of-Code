@@ -1,5 +1,5 @@
 use crate::Solve;
-use std::{collections::{HashMap, HashSet, VecDeque}, time::Instant};
+use std::{collections::{HashSet, VecDeque}, time::Instant};
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn part1(data_in: &str) -> Solve {
@@ -121,9 +121,6 @@ pub fn part2(data_in: &str) -> Solve {
                 perimeter_b
                     .chunk_by(|&(x1, y1), &(x2, y2)| y1 == y2 && x1 + 1 >= x2)
                     .count();
-
-            println!("section {}, with area {}, sides {}", c, area, sides);
-
             solve += area * sides as u32;
         }
     }
