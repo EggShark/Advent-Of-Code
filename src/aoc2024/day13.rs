@@ -4,48 +4,50 @@ use std::{str::FromStr, time::Instant};
 
 pub fn part1(data_in: &str) -> Solve {
     let time = Instant::now();
-    let mut solve = 0;
 
-    let buttons = data_in.split(DOUBLE_NEW_LINE).map(|s| Machine::from_str(s).unwrap()).collect::<Vec<Machine>>();
-    for b in buttons {
+    let buttons: i64 = data_in.split(DOUBLE_NEW_LINE).map(|s| Machine::from_str(s).unwrap())
+    .map(|b| {
         let det = b.button_one.0 * b.button_two.1 - b.button_two.0 * b.button_one.1;
         let d1 = b.prize.0 * b.button_two.1 - b.button_two.0 * b.prize.1;
         let d2 = b.button_one.0 * b.prize.1 - b.prize.0 * b.button_one.1;
 
         if d1 % det == 0 && d2 % det == 0 && d1/det >= 0 && d2/det >= 0 {
-            solve += 3 * (d1 / det) + (d2 / det);
+            3 * (d1 / det) + (d2 / det)
+        } else {
+            0
         }
-    }
+    }).sum();
+
 
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
     Solve {
-        solution: Box::new(solve),
+        solution: Box::new(buttons),
         time_ms,
     }
 }
 
 pub fn part2(data_in: &str) -> Solve {
     let time = Instant::now();
-    let mut solve = 0;
 
-
-    let buttons = data_in.split(DOUBLE_NEW_LINE).map(|s| Machine::from_str(s).unwrap()).collect::<Vec<Machine>>();
-    for b in buttons {
+    let buttons: i64 = data_in.split(DOUBLE_NEW_LINE).map(|s| Machine::from_str(s).unwrap())
+    .map(|b| {
         let prize = (b.prize.0 + 10000000000000, b.prize.1 + 10000000000000);
         let det = b.button_one.0 * b.button_two.1 - b.button_two.0 * b.button_one.1;
         let d1 = prize.0 * b.button_two.1 - b.button_two.0 * prize.1;
         let d2 = b.button_one.0 * prize.1 - prize.0 * b.button_one.1;
 
         if d1 % det == 0 && d2 % det == 0 && d1/det >= 0 && d2/det >= 0 {
-            solve += 3 * (d1 / det) + (d2 / det);
+            3 * (d1 / det) + (d2 / det)
+        }else {
+            0
         }
-    }
+    }).sum();
 
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
     Solve {
-        solution: Box::new(solve),
+        solution: Box::new(buttons),
         time_ms,
     }
 }
