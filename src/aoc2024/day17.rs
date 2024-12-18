@@ -108,6 +108,7 @@ fn run(mut registers: [u64; 3], program: &[u8], out: &mut Vec<u8>) {
 
 fn p2(code: &[u8], i: usize, mut new_a: u64) -> Option<u64> {
     let target = &code[i..];
+    // same as new_a = new_ a << 3
     new_a *= 8;
     for n in new_a..new_a+8 {
         let mut out = Vec::new();
