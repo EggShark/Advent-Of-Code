@@ -4,8 +4,6 @@ use std::time::Instant;
 
 pub fn part1(data_in: &str) -> Solve {
     let time = Instant::now();
-
-    let mut pc = 0;
     let mut registers = [0; 3];
     let mut out: Vec<u8> = vec![];
 
@@ -20,7 +18,7 @@ pub fn part1(data_in: &str) -> Solve {
 
     for (idx, line) in reg_values.lines().enumerate() {
         let (_, right) = line.split_once(": ").unwrap();
-        registers[idx] = right.parse::<u32>().unwrap();
+        registers[idx] = right.parse::<u64>().unwrap();
     }
 
     run(registers, &instructions, &mut out);
@@ -40,8 +38,6 @@ pub fn part1(data_in: &str) -> Solve {
 
 pub fn part2(data_in: &str) -> Solve {
     let time = Instant::now();
-    let mut out: Vec<u8> = vec![];
-
     let (_, instructions) = data_in.split_once(DOUBLE_NEW_LINE).unwrap();
     let instructions = instructions
         .split_once(": ")
@@ -63,7 +59,7 @@ pub fn part2(data_in: &str) -> Solve {
     }
 }
 
-fn run(mut registers: [u32; 3], program: &[u8], out: &mut Vec<u8>) {
+fn run(mut registers: [u64; 3], program: &[u8], out: &mut Vec<u8>) {
     let mut pc = 0;
     while pc < program.len()-1 {
         let instruction = Instruction::from(program[pc]);
@@ -72,10 +68,10 @@ fn run(mut registers: [u32; 3], program: &[u8], out: &mut Vec<u8>) {
             Instruction::DivideA => {
                 let numerator = registers[0];
                 let denom = get_combo(program[pc+1], &registers);
-                registers[0] = numerator/(2_u32.pow(denom));
+                registers[0] = numerator/(2_u64.pow(denom as u32));
             }
             Instruction::Xor => {
-                registers[1] ^= program[pc+1] as u32;
+                registers[1] ^= program[pc+1] as u64;
             }
             Instruction::Mod8 => {
                 let value = get_combo(program[pc+1], &registers);
@@ -96,12 +92,12 @@ fn run(mut registers: [u32; 3], program: &[u8], out: &mut Vec<u8>) {
             Instruction::DivideB => {
                 let numerator = registers[0];
                 let denom = get_combo(program[pc+1], &registers);
-                registers[1] = numerator/(2_u32.pow(denom));
+                registers[1] = numerator/(2_u64.pow(denom as u32));
             }
             Instruction::DivideC => {
                 let numerator = registers[0];
                 let denom = get_combo(program[pc+1], &registers);
-                registers[2] = numerator/(2_u32.pow(denom));
+                registers[2] = numerator/(2_u64.pow(denom as u32));
             }
         }
         if !jumped {
@@ -110,14 +106,12 @@ fn run(mut registers: [u32; 3], program: &[u8], out: &mut Vec<u8>) {
     }
 }
 
-fn p2(code: &[u8], i: usize, mut n: u32) -> Option<u32> {
+fn p2(code: &[u8], i: usize, mut new_a: u64) -> Option<u64> {
     let target = &code[i..];
-    println!("{:?}", target);
-    n *= 8;
-    for n in n..n+8 {
+    new_a *= 8;
+    for n in new_a..new_a+8 {
         let mut out = Vec::new();
         run([n, 0, 0], code, &mut out);
-        println!("{:?}", out);
         if out.ends_with(target) {
             if i == 0 {
                 return Some(n);
@@ -130,7 +124,7 @@ fn p2(code: &[u8], i: usize, mut n: u32) -> Option<u32> {
     None
 }
 
-fn get_combo(literal: u8, registers: &[u32; 3]) -> u32 {
+fn get_combo(literal: u8, registers: &[u64; 3]) -> u64 {
     match literal {
         0 => 0,
         1 => 1,
