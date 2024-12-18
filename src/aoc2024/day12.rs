@@ -1,4 +1,4 @@
-use crate::Solve;
+use crate::{shared::DIRS, Solve};
 use std::{collections::{HashSet, VecDeque}, time::Instant};
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -28,7 +28,7 @@ pub fn part1(data_in: &str) -> Solve {
                 area += 1;
 
                 let mut neigboor_count = 0;
-                for (dy, dx) in [(0, -1), (0, 1), (-1, 0), (1, 0)] {
+                for (dy, dx) in DIRS {
                     if sx + dx >= 0 && sy + dy >= 0
                     && sx + dx < grid.len() as i32 && sy + dy < grid.len() as i32
                     && grid[(sy + dy) as usize][(sx + dx) as usize] == c 

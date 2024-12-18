@@ -1,4 +1,4 @@
-use crate::Solve;
+use crate::{shared::DIRS, Solve};
 use std::{collections::{HashSet, VecDeque}, time::Instant};
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -21,7 +21,7 @@ pub fn part1(data_in: &str) -> Solve {
 
                 while !queue.is_empty() {
                     let (search_x, search_y) = queue.pop_front().unwrap();
-                    for (dx, dy) in [(1,0), (0,1), (-1, 0), (0, -1)] {
+                    for (dx, dy) in DIRS {
                         if search_x + dx >= 0 && search_x + dx < map_size as i32
                             && search_y + dy >= 0 && search_y + dy < map_size as i32
                             && map[(search_y + dy) as usize][(search_x + dx) as usize] as i16 - map[search_y as usize][search_x as usize] as i16 == 1 
@@ -65,7 +65,7 @@ pub fn part2(data_in: &str) -> Solve {
 
                 while !stack.is_empty() {
                     let (search_x, search_y) = stack.pop().unwrap();
-                    for (dx, dy) in [(1,0), (0,1), (-1, 0), (0, -1)] {
+                    for (dx, dy) in DIRS {
                         if search_x + dx >= 0 && search_x + dx < map_size as i32
                             && search_y + dy >= 0 && search_y + dy < map_size as i32
                             && map[(search_y + dy) as usize][(search_x + dx) as usize] as i16 - map[search_y as usize][search_x as usize] as i16 == 1 

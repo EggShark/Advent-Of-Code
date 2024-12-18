@@ -1,4 +1,5 @@
 use crate::Solve;
+use crate::shared::DIRS;
 use std::{collections::{HashSet, VecDeque}, time::Instant};
 ///////////////////////////////////////////////////////////////////////////////
 const GRID_SIZE: usize = 71;
@@ -27,7 +28,7 @@ pub fn part1(data_in: &str) -> Solve {
             break;
         }
 
-        for (dx, dy) in [(-1, 0), (0, -1), (1, 0), (0, 1)] {
+        for (dx, dy) in DIRS {
             if x + dx >= 0 && y + dy >= 0
                 && x + dx < GRID_SIZE as i32 && y + dy < GRID_SIZE as i32
                 && grid[(y + dy) as usize][(x + dx) as usize] == Tile::Empty

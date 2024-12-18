@@ -1,5 +1,7 @@
 use std::ops::Index;
 
+pub const DIRS: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+
 pub struct Grid<T> {
     rows: usize,
     collums: usize,
