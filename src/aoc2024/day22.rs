@@ -1,7 +1,7 @@
 use crate::Solve;
 use std::{collections::{HashMap, HashSet}, time::Instant};
 ///////////////////////////////////////////////////////////////////////////////
-const MOD: u64 = 16777216;
+const MOD: u64 = 0xFFFFFF;
 pub fn part1(data_in: &str) -> Solve {
     let time = Instant::now();
     let solve = data_in
@@ -9,9 +9,9 @@ pub fn part1(data_in: &str) -> Solve {
         .map(|d| d.parse::<u64>().unwrap())
         .map(|mut n| {
             for _ in 0..2000 {
-                n = (n ^ (n * 64)) % MOD;
-                n = (n ^ (n / 32)) % MOD;
-                n = (n ^ (n * 2048)) % MOD;
+                n = (n ^ (n << 6)) & MOD;
+                n = (n ^ (n >> 5)) & MOD;
+                n = (n ^ (n << 11)) & MOD;
             }
             n
         })
@@ -37,9 +37,9 @@ pub fn part2(data_in: &str) -> Solve {
             let mut buyer = [0_u64; 2001];
             buyer[0] = n % 10;
             for i in 0..2000 {
-                n = (n ^ (n * 64)) % MOD;
-                n = (n ^ (n / 32)) % MOD;
-                n = (n ^ (n * 2048)) % MOD;
+                n = (n ^ (n << 6)) & MOD;
+                n = (n ^ (n >> 5)) & MOD;
+                n = (n ^ (n << 11)) & MOD;
                 buyer[i+1] = n % 10;
             }
             let mut seen_suqence: HashSet<(i64, i64, i64, i64)> = HashSet::new();
