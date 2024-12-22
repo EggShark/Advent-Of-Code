@@ -78,9 +78,9 @@ pub fn part2(data_in: &str) -> Solve {
                 continue;
             }
 
-            for dx in -20..21_i32 {
+            for dx in -20..=20_i32 {
                 let dy_max = 20 - dx.abs();
-                for dy in -dy_max..dy_max+1 {
+                for dy in -dy_max..=dy_max {
                     let total_distance = dx.abs() + dy.abs();
                     let (nx, ny) = (x as i32 + dx, y as i32 + dy);
                     if nx < 0 || ny < 0 || ny >= grid.len() as i32 || nx >= grid.len() as i32 {
