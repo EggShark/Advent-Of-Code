@@ -1,5 +1,5 @@
 use crate::Solve;
-use std::{collections::{HashMap, VecDeque}, time::Instant};
+use std::{collections::HashMap, time::Instant};
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn part1(data_in: &str) -> Solve {
@@ -9,7 +9,7 @@ pub fn part1(data_in: &str) -> Solve {
     let mut cache = HashMap::new();
     for line in data_in.lines() {
         let num = line[0..3].parse::<usize>().unwrap();
-        let mut current_pos = (3, 2);
+        let mut current_pos = b_to_num_pad(b'A');
         let mut paths = vec![];
         for b in line.bytes() {
             let next_pos = b_to_num_pad(b);
@@ -36,7 +36,7 @@ pub fn part2(data_in: &str) -> Solve {
     let mut cache = HashMap::new();
     for line in data_in.lines() {
         let num = line[0..3].parse::<usize>().unwrap();
-        let mut current_pos = (3, 2);
+        let mut current_pos = b_to_num_pad(b'A');
         let mut paths = vec![];
         for b in line.bytes() {
             let next_pos = b_to_num_pad(b);
@@ -56,19 +56,19 @@ pub fn part2(data_in: &str) -> Solve {
     }
 }
 
-fn path(from: (u8, u8), to: (u8, u8), numpad: bool) -> Vec<u8> {
+fn path((x1, y1): (u8, u8), (x2, y2): (u8, u8), numpad: bool) -> Vec<u8> {
     let horiz_iter =
-        std::iter::repeat_n(if to.1 > from.1 { b'>' } else { b'<' }, to.1.abs_diff(from.1) as usize);
+        std::iter::repeat_n(if x2 > x1 { b'>' } else { b'<' }, x2.abs_diff(x1) as usize);
     let vert_iter =
-        std::iter::repeat_n(if to.0 > from.0 { b'v' } else { b'^' }, to.0.abs_diff(from.0) as usize);
+        std::iter::repeat_n(if y2 > y1 { b'v' } else { b'^' }, y2.abs_diff(y1) as usize);
     let a_iter = std::iter::once(b'A');
     let blocked = if numpad {
-        (from.0 == 3 && to.1 == 0) || (from.1 == 0 && to.0 == 3)
+        (y1 == 3 && x2 == 0) || (x1 == 0 && y2 == 3)
     } else {
-        (from.1 == 0 && to.0 == 0) || (from.0 == 0 && to.1 == 0)
+        (x1 == 0 && y2 == 0) || (y1 == 0 && x2 == 0)
     };
 
-    if (to.1 < from.1) == blocked {
+    if (x2 < x1) == blocked {
         vert_iter.chain(horiz_iter).chain(a_iter).collect()
     } else {
         horiz_iter.chain(vert_iter).chain(a_iter).collect()
@@ -85,7 +85,7 @@ fn dfs(cache: &mut HashMap<(u8, Vec<u8>), usize>, block: (u8, Vec<u8>)) -> usize
     }
 
     // i prefer x y sorry mister
-    let mut pos = (0, 2);
+    let mut pos = b_to_dir(b'A');
     let mut paths = vec![];
     for &b in block.1.iter() {
         let next_pos = b_to_dir(b);
@@ -105,11 +105,11 @@ fn dfs(cache: &mut HashMap<(u8, Vec<u8>), usize>, block: (u8, Vec<u8>)) -> usize
 // +---+---+---+
 fn b_to_dir(b: u8) -> (u8, u8) {
     match b {
-        b'A' => (0, 2),
-        b'^' => (0, 1),
-        b'<' => (1, 0),
+        b'A' => (2, 0),
+        b'^' => (1, 0),
+        b'<' => (0, 1),
         b'v' => (1, 1),
-        b'>' => (1, 2),
+        b'>' => (2, 1),
         _ => unreachable!(),
     }
 }
@@ -129,10 +129,10 @@ fn b_to_num_pad(b: u8) -> (u8, u8) {
             let count = b - b'1';
             let column = count % 3;
             let row = 2 - (count / 3);
-            (row, column)
+            (column, row)
         }
-        b'0' => (3, 1),
-        b'A' => (3, 2),
+        b'0' => (1, 3),
+        b'A' => (2, 3),
         _ => unreachable!()
     }
 }
