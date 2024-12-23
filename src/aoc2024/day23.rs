@@ -61,13 +61,22 @@ pub fn part2(data_in: &str) -> Solve {
     }
     let nodes = graph.keys().copied().collect::<HashSet<_>>();
 
-    let mut prev_solutions = nodes
+    let prev_solutions = nodes
         .iter()
         .copied()
         .map(|node| core::iter::once(node).collect::<BTreeSet<_>>())
         .collect::<HashSet<_>>();
 
-    let mut out = String::new();
+    let out = solve_p2(graph, nodes, prev_solutions);
+
+    let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
+    Solve {
+        solution: Box::new(out),
+        time_ms,
+    }
+}
+
+fn solve_p2<'a>(graph: HashMap<&'a str, HashSet<&'a str>>, nodes: HashSet<&'a str>, mut prev_solutions: HashSet<BTreeSet<&'a str>>) -> String {
     loop {
         let solutions = prev_solutions
             .iter()
@@ -96,17 +105,9 @@ pub fn part2(data_in: &str) -> Solve {
                 .iter()
                 .copied()
                 .collect::<Vec<_>>();
-            out = solution.join(",");
-            break;
+            return solution.join(",");
         }
 
         prev_solutions = solutions;
-    }
-
-
-    let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
-    Solve {
-        solution: Box::new(out),
-        time_ms,
     }
 }
