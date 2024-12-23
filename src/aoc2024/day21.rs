@@ -1,33 +1,26 @@
 use crate::Solve;
 use std::{collections::{HashMap, VecDeque}, time::Instant};
 ///////////////////////////////////////////////////////////////////////////////
-// +---+---+---+
-// | 7 | 8 | 9 |
-// +---+---+---+
-// | 4 | 5 | 6 |
-// +---+---+---+
-// | 1 | 2 | 3 |
-// +---+---+---+
-//     | 0 | A |
-//     +---+---+
-const NUM_PAD: &[&[u8]] = &[
-    &[b'7', b'8', b'9'],
-    &[b'4', b'5', b'6'],
-    &[b'1', b'2', b'3'],
-    &[b'x', b'0', b'A'],
-];
-
-const DIR_PAD: &[&[u8]]  = &[
-    &[b'x', b'^', b'A'],
-    &[b'<', b'v', b'>'],
-];
 
 pub fn part1(data_in: &str) -> Solve {
     let time = Instant::now();
     let mut solve = 0_usize;
+    
+    let mut cache = HashMap::new();
+    for line in data_in.lines() {
+        let num = line[0..3].parse::<usize>().unwrap();
+        let mut current_pos = (3, 2);
+        let mut paths = vec![];
+        for b in line.bytes() {
+            let next_pos = b_to_num_pad(b);
+            paths.push(path(current_pos, next_pos, true));
+            current_pos = next_pos;
+        }
 
-    let mut data_in = data_in.lines();
-    solve_p1(data_in.next().unwrap().as_bytes(), NUM_PAD);
+        let len = paths.into_iter().map(|p| dfs(&mut cache, (2, p))).sum::<usize>();
+        solve += len * num;
+    }
+
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
     Solve {
@@ -38,7 +31,22 @@ pub fn part1(data_in: &str) -> Solve {
 
 pub fn part2(data_in: &str) -> Solve {
     let time = Instant::now();
-    let solve = 0;
+    let mut solve = 0_usize;
+    
+    let mut cache = HashMap::new();
+    for line in data_in.lines() {
+        let num = line[0..3].parse::<usize>().unwrap();
+        let mut current_pos = (3, 2);
+        let mut paths = vec![];
+        for b in line.bytes() {
+            let next_pos = b_to_num_pad(b);
+            paths.push(path(current_pos, next_pos, true));
+            current_pos = next_pos;
+        }
+
+        let len = paths.into_iter().map(|p| dfs(&mut cache, (25, p))).sum::<usize>();
+        solve += len * num;
+    }
 
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
@@ -48,55 +56,83 @@ pub fn part2(data_in: &str) -> Solve {
     }
 }
 
-fn solve_p1(input: &[u8], keypad: &[&[u8]]) {
-    let mut pos = HashMap::new();
-    for y in 0..keypad.len() {
-        for x in 0..keypad[y].len() {
-            if keypad[y][x] != b'x' {
-                pos.insert(keypad[y][x], (x, y));
-            }
-        }
+fn path(from: (u8, u8), to: (u8, u8), numpad: bool) -> Vec<u8> {
+    let horiz_iter =
+        std::iter::repeat_n(if to.1 > from.1 { b'>' } else { b'<' }, to.1.abs_diff(from.1) as usize);
+    let vert_iter =
+        std::iter::repeat_n(if to.0 > from.0 { b'v' } else { b'^' }, to.0.abs_diff(from.0) as usize);
+    let a_iter = std::iter::once(b'A');
+    let blocked = if numpad {
+        (from.0 == 3 && to.1 == 0) || (from.1 == 0 && to.0 == 3)
+    } else {
+        (from.1 == 0 && to.0 == 0) || (from.0 == 0 && to.1 == 0)
+    };
+
+    if (to.1 < from.1) == blocked {
+        vert_iter.chain(horiz_iter).chain(a_iter).collect()
+    } else {
+        horiz_iter.chain(vert_iter).chain(a_iter).collect()
+    }
+}
+
+fn dfs(cache: &mut HashMap<(u8, Vec<u8>), usize>, block: (u8, Vec<u8>)) -> usize {
+    if let Some(&x) = cache.get(&block) {
+        return x;
     }
 
-    let mut sequences: HashMap<(u8, u8), Vec<Vec<u8>>> = HashMap::new();
-    for (key, &(x, y)) in pos.iter() {
-        for (key_2, &(x2, y2)) in pos.iter() {
-            if key == key_2 {
-                sequences.insert((*key, *key_2), vec![vec![b'A']]);
-                continue;
-            }
-            let mut posibilities = vec![];
-            let mut queue: VecDeque<(usize, usize, Vec<u8>)> = VecDeque::from([(x, y, vec![])]);
-            let mut min = usize::MAX;
-            'bfs: while let Some((px, py, path)) = queue.pop_front() {
-                let px = px as i32;
-                let py = py as i32;
-                for (dx, dy, next_move) in [(1, 0, b'>'), (-1, 0, b'<'), (0, 1, b'v'), (0, -1, b'^')] {
-                    if px + dx < 0 || py + dy < 0 || px + dx >= keypad[0].len() as i32 || py + dy >= keypad.len() as i32 {
-                        continue;
-                    }
-                    if keypad[(py + dy) as usize][(px + dx) as usize] == b'x' {
-                        continue;
-                    }
-
-                    let mut copy = path.clone();
-                    copy.push(next_move);
-                    if keypad[(dy + py) as usize][(dx + px) as usize] == *key_2 {
-                        if min < copy.len() {break 'bfs}
-                        min = copy.len();
-                        copy.push(b'A');
-                        posibilities.push(copy);
-                    } else {
-                        queue.push_back(((dx + px) as usize, (dy + py) as usize, copy));
-                    }
-            }
-            }
-
-            assert_ne!(posibilities.len(), 0);
-
-            sequences.insert((*key, *key_2), posibilities);
-        }
+    if block.0 == 0 {
+        return block.1.len();
     }
 
-    assert_eq!(sequences.get(&(b'2', b'9')).unwrap().len(), 3);
+    // i prefer x y sorry mister
+    let mut pos = (0, 2);
+    let mut paths = vec![];
+    for &b in block.1.iter() {
+        let next_pos = b_to_dir(b);
+        paths.push(path(pos, next_pos, false));
+        pos = next_pos;
+    }
+
+    let distance = paths.into_iter().map(|p| dfs(cache, (block.0 - 1, p))).sum::<usize>();
+
+    cache.insert(block, distance);
+    distance
+}
+//      +---+---+
+//      | ^ | A |
+// +---+---+---+
+// | < | v | > |
+// +---+---+---+
+fn b_to_dir(b: u8) -> (u8, u8) {
+    match b {
+        b'A' => (0, 2),
+        b'^' => (0, 1),
+        b'<' => (1, 0),
+        b'v' => (1, 1),
+        b'>' => (1, 2),
+        _ => unreachable!(),
+    }
+}
+
+// +---+---+---+
+// | 7 | 8 | 9 |
+// +---+---+---+
+// | 4 | 5 | 6 |
+// +---+---+---+
+// | 1 | 2 | 3 |
+// +---+---+---+
+//     | 0 | A |
+//     +---+---+
+fn b_to_num_pad(b: u8) -> (u8, u8) {
+    match b {
+        b'1'..=b'9' => {
+            let count = b - b'1';
+            let column = count % 3;
+            let row = 2 - (count / 3);
+            (row, column)
+        }
+        b'0' => (3, 1),
+        b'A' => (3, 2),
+        _ => unreachable!()
+    }
 }
