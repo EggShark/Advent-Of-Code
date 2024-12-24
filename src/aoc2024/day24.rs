@@ -57,120 +57,6 @@ pub fn part1(data_in: &str) -> Solve {
     }
 }
 
-fn verifiy_z<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
-    // println!("vz, {}, {}", wire, num);
-
-    if !instructions.contains_key(wire) {
-        return false;
-    }
-
-    let inst = instructions.get(wire).unwrap();
-    if inst.operation != Op::Xor {
-        return false;
-    }
-    
-    if num == 0 {
-        let mut test = [inst.left, inst.right];
-        test.sort();
-        return test == ["x00", "y00"];
-    }
-    
-    (verifiy_i_xor(&inst.left, num, instructions) && verifiy_carry(&inst.right, num, instructions))
-        || (verifiy_i_xor(&inst.right, num, instructions) && verifiy_carry(&inst.left, num, instructions))
-}
-
-fn verifiy_i_xor<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
-    // println!("vx {}, {}", wire, num);
-
-    if !instructions.contains_key(wire) {
-        return false;
-    }
-
-    let inst = instructions.get(wire).unwrap();
-    if inst.operation != Op::Xor {
-        return false;
-    }
-
-    let mut test = [inst.left, inst.right];
-    test.sort();
-
-    test == [&make_wire("x", num), &make_wire("y", num)]
-}
-
-fn verifiy_carry<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
-    // println!("vc {}, {}", wire, num);
-
-    if !instructions.contains_key(wire) {
-        return false;
-    }
-
-    let inst = instructions.get(wire).unwrap();
-    if num == 1 {
-        if inst.operation != Op::And {
-            return false;
-        }
-
-        let mut test = [inst.left, inst.right];
-        test.sort();
-        return test == ["x00", "y00"];
-    }
-    if inst.operation != Op::Or {
-        return  false;
-    }
-    
-    verifiy_d_carry(&inst.left, num - 1, instructions) && verifiy_recarry(&inst.right, num - 1, instructions)
-        || verifiy_d_carry(&inst.right, num - 1, instructions) && verifiy_recarry(&inst.left, num - 1, instructions)
-}
-
-fn verifiy_recarry<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
-    // println!("vr {} {}", wire, num);
-
-    if !instructions.contains_key(wire) {
-        return false;
-    }
-
-    let inst = instructions.get(wire).unwrap();
-    if inst.operation != Op::And {
-        return false
-    }
-
-    verifiy_i_xor(&inst.left, num, instructions) && verifiy_carry(&inst.right, num, instructions)
-        || verifiy_i_xor(&inst.right, num, instructions) && verifiy_carry(&inst.left, num, instructions)
-}
-
-fn verifiy_d_carry<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
-    // println!("vd {} {}", wire, num);
-
-    if !instructions.contains_key(wire) {
-        return false;
-    }
-
-    let inst = instructions.get(wire).unwrap();
-    if inst.operation != Op::And {
-        return false;
-    }
-    let mut test= [inst.left, inst.right];
-    test.sort();
-    test == [&make_wire("x", num), &make_wire("y", num)]
-}
-
-fn make_wire(letter: &str, num: u64) -> String {
-    format!("{}{:02}", letter, num)
-}
-
-fn verify<'a>(num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
-    verifiy_z(&make_wire("z", num), num, &instructions)
-}
-
-fn depth<'a>(instructions: &HashMap<&'a str, Instruction<'a>>) -> u64 {
-    let mut i = 0;
-    while verify(i, instructions) {
-        i += 1;
-    }
-
-    i
-}
-
 pub fn part2(data_in: &str) -> Solve {
     let time = Instant::now();
 
@@ -197,6 +83,7 @@ pub fn part2(data_in: &str) -> Solve {
 
     let keys = instructions.keys().copied().collect::<Vec<_>>();
     let mut swapped = vec![];
+    
     for _ in 0..4 {
         let base = depth(&instructions);
         'o: for &x in keys.iter() {
@@ -246,6 +133,110 @@ fn calculate_wire<'a>(wire: &'a str, known: &mut HashMap<&'a str, u64>, instruct
     known.insert(wire, value);
 
     value
+}
+
+fn verifiy_z<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
+    if !instructions.contains_key(wire) {
+        return false;
+    }
+
+    let inst = instructions.get(wire).unwrap();
+    if inst.operation != Op::Xor {
+        return false;
+    }
+    
+    if num == 0 {
+        let mut test = [inst.left, inst.right];
+        test.sort();
+        return test == ["x00", "y00"];
+    }
+    
+    (verifiy_i_xor(&inst.left, num, instructions) && verifiy_carry(&inst.right, num, instructions))
+        || (verifiy_i_xor(&inst.right, num, instructions) && verifiy_carry(&inst.left, num, instructions))
+}
+
+fn verifiy_i_xor<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
+    if !instructions.contains_key(wire) {
+        return false;
+    }
+
+    let inst = instructions.get(wire).unwrap();
+    if inst.operation != Op::Xor {
+        return false;
+    }
+
+    let mut test = [inst.left, inst.right];
+    test.sort();
+
+    test == [&make_wire("x", num), &make_wire("y", num)]
+}
+
+fn verifiy_carry<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
+    if !instructions.contains_key(wire) {
+        return false;
+    }
+
+    let inst = instructions.get(wire).unwrap();
+    if num == 1 {
+        if inst.operation != Op::And {
+            return false;
+        }
+
+        let mut test = [inst.left, inst.right];
+        test.sort();
+        return test == ["x00", "y00"];
+    }
+    if inst.operation != Op::Or {
+        return  false;
+    }
+    
+    verifiy_d_carry(&inst.left, num - 1, instructions) && verifiy_recarry(&inst.right, num - 1, instructions)
+        || verifiy_d_carry(&inst.right, num - 1, instructions) && verifiy_recarry(&inst.left, num - 1, instructions)
+}
+
+fn verifiy_recarry<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
+    if !instructions.contains_key(wire) {
+        return false;
+    }
+
+    let inst = instructions.get(wire).unwrap();
+    if inst.operation != Op::And {
+        return false
+    }
+
+    verifiy_i_xor(&inst.left, num, instructions) && verifiy_carry(&inst.right, num, instructions)
+        || verifiy_i_xor(&inst.right, num, instructions) && verifiy_carry(&inst.left, num, instructions)
+}
+
+fn verifiy_d_carry<'a>(wire: &'a str, num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
+    if !instructions.contains_key(wire) {
+        return false;
+    }
+
+    let inst = instructions.get(wire).unwrap();
+    if inst.operation != Op::And {
+        return false;
+    }
+    let mut test= [inst.left, inst.right];
+    test.sort();
+    test == [&make_wire("x", num), &make_wire("y", num)]
+}
+
+fn make_wire(letter: &str, num: u64) -> String {
+    format!("{}{:02}", letter, num)
+}
+
+fn verify<'a>(num: u64, instructions: &HashMap<&'a str, Instruction<'a>>) -> bool {
+    verifiy_z(&make_wire("z", num), num, &instructions)
+}
+
+fn depth<'a>(instructions: &HashMap<&'a str, Instruction<'a>>) -> u64 {
+    let mut i = 0;
+    while verify(i, instructions) {
+        i += 1;
+    }
+
+    i
 }
 
 #[derive(Debug, Clone, Copy)]
