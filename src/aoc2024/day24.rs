@@ -38,17 +38,10 @@ pub fn part1(data_in: &str) -> Solve {
     let mut keys_to_search = instructions.keys().copied().filter(|k| k.starts_with("z")).collect::<Vec<_>>();
     keys_to_search.sort_unstable_by(|l, r| r.cmp(l));
 
-
-    let mut zs = vec![];
-    for key in keys_to_search {
-        zs.push(calculate_wire(key, &mut wires, &instructions));
-    }
-
-    let mut solve = 0;
-    for b in zs.into_iter() {
-        solve <<= 1;
-        solve += b;
-    }
+    let solve = keys_to_search
+        .into_iter()
+        .map(|key| calculate_wire(key, &mut wires, &instructions))
+        .fold(0, |acc, x| (acc << 1) + x);
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
     Solve {
