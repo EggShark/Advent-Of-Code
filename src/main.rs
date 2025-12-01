@@ -1,6 +1,7 @@
 mod aoc2022;
 mod aoc2023;
 mod aoc2024;
+mod aoc2025;
 mod soultions;
 mod shared;
 
@@ -22,7 +23,7 @@ fn main() {
     let mut test = false;
     let mut bench = false;
     let mut days: Vec<u8> = Vec::new();
-    let mut year: u16 = 2024;
+    let mut year: u16 = 2025;
 
     let mut iter = args.iter().peekable();
     iter.next(); // ignrore path arguments
@@ -47,13 +48,15 @@ fn main() {
         }
     }
 
-    assert!(year >= 2022 && year <= 2024);
+    assert!(year >= 2022 && year <= 2025);
 
     match (year, bench) {
         (2022, _) => aoc2022::run(&days),
         (2023, _) => aoc2023::run(&days),
         (2024, false) => aoc2024::run(&days, test),
         (2024, true) => aoc2024::bench(&days, test),
+        (2025, false) => aoc2025::run(&days, test),
+        (2025, true) => aoc2025::bench(&days, test),
         _ => unimplemented!(),
     }
 }
