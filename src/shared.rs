@@ -13,7 +13,7 @@ impl<T> Grid<T> {
         if y >= self.rows || x >= self.rows {
             None
         } else {
-            Some(&self[(x , y)])
+            Some(&self[(x, y)])
         }
     }
 }
