@@ -9,8 +9,8 @@ pub fn part1(data_in: &str) -> Solve {
     for range in data_in.split(',') {
         let (l, r) = range.split_once('-').unwrap();
         let (start, end) = (
-            l.trim().parse::<i64>().unwrap(),
-            r.trim().parse::<i64>().unwrap(),
+            l.trim().parse::<u64>().unwrap(),
+            r.trim().parse::<u64>().unwrap(),
         );
         for i in start..=end {
             let num_digits = i.ilog10() + 1;
@@ -18,20 +18,9 @@ pub fn part1(data_in: &str) -> Solve {
                 continue;
             }
 
-            let mut left = 0;
-            let mut d = i;
-            let mut right = 0;
-
-            for _ in 0..num_digits / 2 {
-                left *= 10;
-                left += d % 10;
-                d /= 10;
-            }
-            for _ in 0..num_digits / 2 {
-                right *= 10;
-                right += d % 10;
-                d /= 10;
-            }
+            let mult = 10_u64.pow(num_digits / 2);
+            let right = i / mult;
+            let left = i - right * mult;
 
             if left == right {
                 solve += i;
