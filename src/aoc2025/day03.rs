@@ -7,16 +7,13 @@ pub fn part1(data_in: &str) -> Solve {
     let mut solve = 0;
 
     for line in data_in.lines() {
-        let mut max = 0;
         let digits = line.bytes().map(|c| (c-48) as u32).collect::<Vec<_>>();
 
-        for i in 0..digits.len() - 1 {
-            for j in i+1..digits.len() {
-                max = std::cmp::max(max, digits[i]*10 + digits[j]);
-            }
-        }
 
-        solve += max;
+        let (max_idx, max_1) = position_max_copy(&digits[..digits.len()-1]).unwrap();
+        let (_, max_2) = position_max_copy(&digits[max_idx+1..]).unwrap();
+
+        solve += max_1 * 10 + max_2;
     }
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
