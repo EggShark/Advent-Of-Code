@@ -47,8 +47,6 @@ pub fn part2(data_in: &str) -> Solve {
         solve += max;
     }
 
-
-
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
     Solve {
         solution: Box::new(solve),
