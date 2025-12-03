@@ -19,12 +19,12 @@ pub fn bench(days: &[u8], test: bool) {
         let mut time_p1 = 0.0;
         let mut time_p2 = 0.0;
         let text: String = fs::read_to_string(format!("src/aoc2025/inputs/{}/day{day}", if test {"test"} else {"real"})).unwrap();
-        
+       
         //todo multithread
         for _ in 0..10 {
             let (p1, p2) = get_funcs(*day);
-            time_p1 += p1(&text).time_ms;
-            time_p2 += p2(&text).time_ms;
+            time_p1 += p1(text.trim()).time_ms;
+            time_p2 += p2(text.trim()).time_ms;
         }
 
         let p1_average = time_p1 / 10.0;
@@ -50,8 +50,8 @@ pub fn run(days: &[u8], test: bool) {
 
 fn solve_day(day: u8, test: bool, part1: fn(&str) -> Solve, part2: fn(&str) -> Solve) -> f64 {
     let text: String = fs::read_to_string(format!("src/aoc2025/inputs/{}/day{day}", if test {"test"} else {"real"})).unwrap();
-    let p1 = part1(&text);
-    let p2 = part2(&text);
+    let p1 = part1(text.trim());
+    let p2 = part2(text.trim());
     println!("\n=== Day {:02} ===", day);
     println!("  . Part 1:      {}", p1.solution);
     println!("  . Part 2:      {}", p2.solution);

@@ -9,8 +9,8 @@ pub fn part1(data_in: &str) -> Solve {
     for range in data_in.split(',') {
         let (l, r) = range.split_once('-').unwrap();
         let (start, end) = (
-            l.trim().parse::<u64>().unwrap(),
-            r.trim().parse::<u64>().unwrap(),
+            l.parse::<u64>().unwrap(),
+            r.parse::<u64>().unwrap(),
         );
         for i in start..=end {
             let num_digits = i.ilog10() + 1;
@@ -42,8 +42,8 @@ pub fn part2(data_in: &str) -> Solve {
     for x in data_in.split(",") {
         let (l, r) = x.split_once("-").unwrap();
         let (start, end) = (
-            l.trim().parse::<u64>().unwrap(),
-            r.trim().parse::<u64>().unwrap(),
+            l.parse::<u64>().unwrap(),
+            r.parse::<u64>().unwrap(),
         );
 
         for i in start..=end {
