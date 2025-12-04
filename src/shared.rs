@@ -16,11 +16,23 @@ impl<T> Grid<T> {
             Some(&self[(x, y)])
         }
     }
+
+    pub fn from_lines(data_in: &str, x: fn(u8)->T, ) -> Self {
+        let collums = data_in.bytes().position(|b| b==b'\n').unwrap();
+        let inner = data_in.bytes().filter(|b| *b==b'\n').map(x).collect::<Vec<T>>();
+        let rows = inner.len()/collums;
+
+        Self {
+            rows,
+            collums,
+            inner,
+        }
+    }
 }
 
 impl<T> Index<(usize, usize)> for Grid<T> {
     type Output = T;
     fn index(&self, (x, y): (usize, usize)) -> &Self::Output {
-        &self.inner[y * self.rows + x]
+        &self.inner[y * self.collums + x]
     }
 }
