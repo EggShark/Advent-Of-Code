@@ -9,9 +9,9 @@ pub fn part1(data_in: &str) -> Solve {
         .map(|l| (&l[0..1], l[1..].parse::<i32>().unwrap()))
         .fold((0, 50), |(s, p), (d, i)| {
             if d == "L" {
-                (s + ((p-i)%100==0) as i32 ,(p-i).rem_euclid(100))
+                (s + ((p-i)%100==0) as i32 ,(p-i) % 100)
             } else {
-                (s + ((p+i)%100 == 0) as i32, (p+i).rem_euclid(100))
+                (s + ((p+i)%100 == 0) as i32, (p+i) % 100)
             }
         }).0;
 
