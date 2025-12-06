@@ -48,9 +48,8 @@ pub fn part2(data_in: &str) -> Solve {
                 ranges[i].1 = ranges[i + 1].1;
             }
             ranges.remove(i+1);
-        } else {
-            i += 1;
         }
+        i += 1;
     }
 
     for (start, end) in ranges {
