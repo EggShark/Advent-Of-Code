@@ -38,28 +38,52 @@ pub fn part1(data_in: &str) -> Solve {
 
 pub fn part2(data_in: &str) -> Solve {
     let time = Instant::now();
-    let mut solve = 0;
-    
-    const COL_SIZE: usize = 3;
+    let mut solve: u64 = 0;
 
-    let ops = data_in.lines().last().unwrap().bytes().filter(|b| *b != b' ').collect::<Vec<_>>();
-    let digits = data_in
-        .lines()
-        .take_while(|l| !(l.starts_with("+")||l.starts_with("*")))
-        .map(|l| l.split(' ').map(|c| c.bytes().collect::<Vec<_>>()).collect::<Vec<_>>())
+    let grid = data_in.lines()
+        .take_while(|l| !(l.starts_with('+') || l.starts_with("*")))
+        .map(|l| l.bytes().collect::<Vec<_>>())
         .collect::<Vec<_>>();
 
-    println!("{:?}", digits);
-    assert_eq!(digits[0].len()/COL_SIZE, ops.len());
+    let ops = data_in.lines().last().unwrap().split_ascii_whitespace().collect::<Vec<_>>();
 
-    for x in (0..digits[0].len()).rev() {
-        let op_col = x / COL_SIZE;
-        let c_score = if ops[op_col] == b'+' {
-            0
+    let mut i = 0;
+    let mut c_score = if ops[0] == "*" {
+        1
+    } else {
+        0
+    };
+
+    for x in 0..grid[0].len() {
+        let mut num = 0;
+        for y in 0..grid.len() {
+            if grid[y][x] == b' ' {
+                continue;
+            }
+            num *= 10;
+            num += (grid[y][x] - b'0') as u64;
+        }
+        if num == 0 {
+            if i + 1 == ops.len() {
+                break;
+            }
+            i += 1;
+            solve += c_score;
+            c_score = if ops[i] == "*" {
+                1
+            } else {
+                0
+            };
+            continue;
+        }
+        if ops[i] == "*" {
+            c_score *= num;
         } else {
-            1
-        };
+            c_score += num;
+        }
     }
+
+    solve += c_score;
 
     let time_ms = time.elapsed().as_nanos() as f64 / 1000000.0;
     Solve {
