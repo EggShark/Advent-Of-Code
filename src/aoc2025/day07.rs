@@ -80,6 +80,7 @@ pub fn part2(data_in: &str) -> Solve {
             if grid[ys][x] == Tile::Spliter {
                 // hash tile and just auto solve += 2;
                 // or also count how many times we get to the bottom splitters * 2 idk
+                // keep track of # of splits and * 2 at end for score per beam ig?
                 if seen_shit.insert((ys, x+1)) {
                     pos.push((ys, x+1));
                     solve += 1;
