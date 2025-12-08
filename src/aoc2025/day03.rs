@@ -24,7 +24,7 @@ pub fn part1(data_in: &str) -> Solve {
 }
 
 fn position_max_copy<T: Ord + Copy>(slice: &[T]) -> Option<(usize, &T)> {
-    slice.iter().enumerate().rev().max_by_key(|(_, &value)| value)
+    slice.iter().enumerate().rev().max_by_key(|&(_, value)| value)
 }
 
 pub fn part2(data_in: &str) -> Solve {
